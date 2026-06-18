@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>DiMOE · Hacer un Pedido</title>
+<style>
+:root {
+  --gold: #e8b84b;
+  --gold2: #c8922a;
+  --dark: #0e0c09;
+  --dark2: #161410;
+  --dark3: #1e1a12;
+  --border: rgba(232,184,75,.18);
+  --muted: #6b6050;
+  --text: #f0ece2;
+  --text2: #9a8f7a;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --blue: #3b82f6;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--dark); color: var(--text); min-height: 100svh; max-width: 430px; margin: 0 auto; position: relative; overflow-x: hidden; }
+
+/* STEPS */
+.step { display: none; flex-direction: column; min-height: 100svh; }
+.step.active { display: flex; }
+
+/* TOP BAR */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(14,12,9,.96); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+}
+.back-btn {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--dark3);
+  border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px; flex-shrink: 0;
+}
+.topbar-info { flex: 1; }
+.topbar-info h2 { font-size: 16px; font-weight: 700; }
+.topbar-info span { font-size: 11px; color: var(--text2); }
+.topbar-logo { height: 32px; filter: brightness(0) invert(1); opacity: .85; }
+
+/* PROGRESS BAR */
+.progress-wrap { padding: 14px 16px 8px; background: var(--dark); }
+.progress-steps { display: flex; gap: 6px; }
+.ps { flex: 1; height: 3px; border-radius: 2px; background: var(--dark3); transition: background .3s; }
+.ps.done { background: var(--gold); }
+.ps.active { background: var(--gold); opacity: .5; }
+.progress-label { display: flex; justify-content: space-between; margin-top: 8px; }
+.progress-label span { font-size: 10px; color: var(--text2); }
+.progress-label span.active { color: var(--gold); font-weight: 600; }
+
+/* ========== STEP 1: MENÚ ========== */
+.menu-hero {
+  background: linear-gradient(135deg, var(--dark3), #1a1200);
+  padding: 16px; display: flex; align-items: center; gap: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.menu-hero img { width: 52px; height: 52px; border-radius: 10px; object-fit: contain; background: #fff; padding: 4px; }
+.menu-hero-info h1 { font-size: 18px; font-weight: 800; }
+.menu-hero-info p { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.menu-hero-badges { display: flex; gap: 6px; margin-top: 6px; }
+.mbadge { font-size: 10px; background: rgba(232,184,75,.1); border: 1px solid var(--border); color: var(--gold); padding: 2px 8px; border-radius: 99px; }
+
+.cats { display: flex; gap: 8px; padding: 14px 16px; overflow-x: auto; border-bottom: 1px solid var(--border); }
+.cats::-webkit-scrollbar { display: none; }
+.cat-btn {
+  flex-shrink: 0; padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 600;
+  background: var(--dark3); border: 1px solid var(--border); color: var(--text2); cursor: pointer;
+  transition: all .15s; white-space: nowrap;
+}
+.cat-btn.active { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+
+.menu-list { flex: 1; padding: 8px 0; overflow-y: auto; }
+.cat-section { display: none; }
+.cat-section.active { display: block; }
+.cat-title { font-size: 11px; font-weight: 700; color: var(--text2); letter-spacing: .1em; text-transform: uppercase; padding: 12px 16px 6px; }
+
+.item-row {
+  display: flex; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,.04);
+  align-items: center; cursor: pointer; transition: background .12s;
+}
+.item-row:hover, .item-row:active { background: rgba(255,255,255,.03); }
+.item-img { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+.item-info { flex: 1; }
+.item-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.item-desc { font-size: 11.5px; color: var(--text2); line-height: 1.45; margin-bottom: 6px; }
+.item-tags { display: flex; gap: 4px; }
+.itag { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+.itag-v { background: rgba(46,204,113,.12); color: var(--green); }
+.itag-s { background: rgba(231,76,60,.12); color: var(--red); }
+.itag-g { background: rgba(232,184,75,.12); color: var(--gold); }
+.item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+.item-price { font-size: 16px; font-weight: 800; color: var(--gold); }
+.add-btn {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--gold); color: var(--dark);
+  border: none; font-size: 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: transform .12s;
+}
+.add-btn:active { transform: scale(.9); }
+.qty-ctrl { display: flex; align-items: center; gap: 8px; }
+.qty-btn { width: 28px; height: 28px; border-radius: 50%; background: var(--dark3); border: 1px solid var(--border); color: var(--text); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.qty-num { font-size: 14px; font-weight: 700; min-width: 16px; text-align: center; }
+
+/* CART STICKY */
+.cart-bar {
+  position: sticky; bottom: 0; left: 0; right: 0;
+  background: var(--gold); padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; transition: all .2s; transform: translateY(100%); opacity: 0;
+  border-radius: 14px 14px 0 0; box-shadow: 0 -8px 32px rgba(0,0,0,.4);
+}
+.cart-bar.show { transform: translateY(0); opacity: 1; }
+.cart-bar:active { filter: brightness(.95); }
+.cart-bar-left { display: flex; align-items: center; gap: 10px; }
+.cart-count { background: var(--dark); color: var(--gold); width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
+.cart-bar-text { font-size: 14px; font-weight: 700; color: var(--dark); }
+.cart-bar-price { font-size: 16px; font-weight: 800; color: var(--dark); }
+
+/* ========== STEP 2: CARRITO ========== */
+.cart-list { flex: 1; padding: 8px 0; }
+.cart-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,.04); }
+.cart-item-img { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+.cart-item-info { flex: 1; }
+.cart-item-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.cart-item-price { font-size: 13px; color: var(--gold); font-weight: 600; }
+.cart-item-note { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.cart-item-ctrl { display: flex; align-items: center; gap: 8px; }
+.c-btn { width: 28px; height: 28px; border-radius: 50%; background: var(--dark3); border: 1px solid var(--border); color: var(--text); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .12s; }
+.c-btn:hover { background: var(--gold); color: var(--dark); }
+.c-num { font-size: 14px; font-weight: 700; min-width: 20px; text-align: center; }
+
+.note-section { padding: 16px; border-bottom: 1px solid var(--border); }
+.note-section label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text2); display: block; margin-bottom: 8px; }
+.note-input { width: 100%; background: var(--dark3); border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--text); font-size: 13px; font-family: inherit; outline: none; resize: none; transition: border-color .2s; }
+.note-input:focus { border-color: var(--gold); }
+
+.summary-box { padding: 16px; }
+.summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: var(--text2); }
+.summary-row.total { font-size: 16px; font-weight: 800; color: var(--text); padding-top: 12px; border-top: 1px solid var(--border); margin-top: 6px; }
+.summary-row.total span:last-child { color: var(--gold); }
+
+.coupon-row { margin: 0 16px 16px; background: var(--dark3); border: 1px dashed var(--border); border-radius: 10px; padding: 11px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: border-color .2s; }
+.coupon-row:hover { border-color: var(--gold); }
+.coupon-row span { font-size: 13px; color: var(--text2); flex: 1; }
+.coupon-row .arrow { color: var(--gold); font-size: 16px; }
+
+/* ========== STEP 3: CHECKOUT ========== */
+.checkout-body { flex: 1; overflow-y: auto; padding-bottom: 100px; }
+.section-block { padding: 16px; border-bottom: 1px solid var(--border); }
+.section-block h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text2); margin-bottom: 14px; }
+
+.type-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.type-opt {
+  border: 2px solid var(--border); border-radius: 12px; padding: 14px;
+  text-align: center; cursor: pointer; transition: all .2s;
+}
+.type-opt.sel { border-color: var(--gold); background: rgba(232,184,75,.07); }
+.type-opt .emoji { font-size: 26px; display: block; margin-bottom: 6px; }
+.type-opt strong { display: block; font-size: 13px; margin-bottom: 2px; }
+.type-opt span { font-size: 11px; color: var(--text2); }
+
+.addr-box { background: var(--dark3); border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: flex; gap: 12px; align-items: flex-start; cursor: pointer; transition: border-color .2s; }
+.addr-box:hover { border-color: var(--gold); }
+.addr-icon { font-size: 22px; flex-shrink: 0; }
+.addr-info strong { font-size: 14px; display: block; margin-bottom: 2px; }
+.addr-info span { font-size: 12px; color: var(--text2); }
+.addr-change { font-size: 11px; color: var(--gold); margin-top: 4px; display: block; }
+
+.time-opts { display: flex; gap: 8px; flex-wrap: wrap; }
+.time-opt { padding: 8px 16px; border-radius: 99px; border: 1px solid var(--border); font-size: 12px; cursor: pointer; transition: all .15s; background: var(--dark3); color: var(--text2); }
+.time-opt.sel { background: var(--gold); color: var(--dark); border-color: var(--gold); font-weight: 700; }
+
+.pay-methods { display: flex; flex-direction: column; gap: 8px; }
+.pay-opt {
+  border: 2px solid var(--border); border-radius: 12px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all .2s;
+}
+.pay-opt.sel { border-color: var(--gold); background: rgba(232,184,75,.07); }
+.pay-icon { font-size: 22px; flex-shrink: 0; }
+.pay-info { flex: 1; }
+.pay-info strong { display: block; font-size: 13px; margin-bottom: 1px; }
+.pay-info span { font-size: 11px; color: var(--text2); }
+.pay-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; transition: all .2s; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+.pay-opt.sel .pay-check { background: var(--gold); border-color: var(--gold); color: var(--dark); }
+
+.order-summary-mini { background: var(--dark3); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+.osm-item { display: flex; gap: 10px; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.04); align-items: center; }
+.osm-item:last-child { border-bottom: none; }
+.osm-qty { width: 22px; height: 22px; background: var(--gold); color: var(--dark); border-radius: 6px; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.osm-name { flex: 1; font-size: 13px; }
+.osm-price { font-size: 13px; font-weight: 700; color: var(--gold); }
+
+/* BOTTOM CTA */
+.bottom-cta {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 430px;
+  padding: 14px 16px; background: rgba(14,12,9,.97); border-top: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+.cta-btn {
+  width: 100%; background: var(--gold); color: var(--dark); border: none; border-radius: 14px;
+  padding: 16px; font-size: 15px; font-weight: 800; cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.cta-btn:active { transform: scale(.98); filter: brightness(.95); }
+.cta-btn .price { opacity: .75; font-size: 14px; }
+
+/* ========== STEP 4: CONFIRMACIÓN ========== */
+.confirm-step { background: var(--dark); }
+.confirm-hero {
+  background: linear-gradient(160deg, #1a2e1a, #0e0c09);
+  padding: 40px 24px 28px; text-align: center; border-bottom: 1px solid var(--border);
+}
+.confirm-icon { font-size: 64px; display: block; margin-bottom: 16px; animation: pop .5s cubic-bezier(.175,.885,.32,1.275); }
+@keyframes pop { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+.confirm-hero h2 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+.confirm-hero p { font-size: 14px; color: var(--text2); }
+.order-num-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(232,184,75,.1); border: 1px solid var(--border);
+  border-radius: 99px; padding: 8px 18px; margin-top: 16px;
+  font-size: 13px; font-weight: 700; color: var(--gold);
+}
+
+.tracking-box { padding: 20px 16px; border-bottom: 1px solid var(--border); }
+.tracking-box h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text2); margin-bottom: 16px; }
+.track-steps { display: flex; flex-direction: column; gap: 0; }
+.ts { display: flex; gap: 14px; padding: 10px 0; position: relative; align-items: flex-start; }
+.ts-dot-wrap { display: flex; flex-direction: column; align-items: center; }
+.ts-dot { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; z-index: 1; }
+.ts-line { width: 2px; flex: 1; min-height: 20px; background: var(--border); margin: 2px 0; }
+.ts.done .ts-dot { background: var(--green); }
+.ts.active .ts-dot { background: rgba(232,184,75,.2); border: 2px solid var(--gold); animation: glow 2s infinite; }
+.ts.pend .ts-dot { background: var(--dark3); border: 1px solid var(--border); }
+@keyframes glow { 0%,100%{box-shadow:0 0 0 0 rgba(232,184,75,.4)} 50%{box-shadow:0 0 0 8px rgba(232,184,75,0)} }
+.ts-info { flex: 1; padding-top: 7px; }
+.ts-title { font-size: 14px; font-weight: 700; }
+.ts-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.ts.active .ts-title { color: var(--gold); }
+.ts.pend .ts-title, .ts.pend .ts-sub { opacity: .4; }
+.ts.done .ts-title { color: var(--green); }
+
+.eta-bar {
+  margin: 0 16px 16px; background: var(--dark3); border-radius: 14px;
+  border: 1px solid var(--border); padding: 16px; text-align: center;
+}
+.eta-num { font-size: 48px; font-weight: 900; color: var(--gold); line-height: 1; }
+.eta-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+.wa-confirm { margin: 0 16px 16px; background: rgba(37,211,102,.07); border: 1px solid rgba(37,211,102,.2); border-radius: 14px; padding: 14px; display: flex; gap: 12px; align-items: center; }
+.wa-icon { width: 40px; height: 40px; background: #25d366; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.wa-confirm-text strong { display: block; font-size: 13px; margin-bottom: 3px; }
+.wa-confirm-text span { font-size: 12px; color: var(--text2); }
+
+.confirm-actions { padding: 0 16px 32px; display: flex; flex-direction: column; gap: 10px; }
+.btn-full { width: 100%; padding: 15px; border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all .15s; font-family: inherit; }
+.btn-gold { background: var(--gold); color: var(--dark); }
+.btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+/* UTILS */
+.scrollable { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 90px; }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--dark3); border: 1px solid var(--border); color: var(--text);
+  padding: 10px 18px; border-radius: 99px; font-size: 13px; font-weight: 600;
+  opacity: 0; transition: all .3s; pointer-events: none; white-space: nowrap; z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* SCROLL SMOOTH */
+::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+
+<!-- ============ STEP 1: MENÚ ============ -->
+<div class="step active" id="step1">
+  <div class="topbar">
+    <img class="topbar-logo" src="imagenes/logo.png" alt="DiMOE" onerror="this.style.display='none'">
+    <div class="topbar-info">
+      <h2>DiMOE Pizzería</h2>
+      <span>📍 Darío Pavez 16, Paine · Abierto ahora</span>
+    </div>
+  </div>
+
+  <div class="menu-hero">
+    <img src="imagenes/logo.png" alt="DiMOE">
+    <div class="menu-hero-info">
+      <h1>DiMOE</h1>
+      <p>⭐ 4.8 · 312 reseñas · ~30 min</p>
+      <div class="menu-hero-badges">
+        <span class="mbadge">🐾 Pet Friendly</span>
+        <span class="mbadge">🌱 Vegano</span>
+        <span class="mbadge">🏆 Top RM</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cats">
+    <button class="cat-btn active" onclick="setcat('pizzas',this)">🍕 Pizzas</button>
+    <button class="cat-btn" onclick="setcat('entradas',this)">🥗 Entradas</button>
+    <button class="cat-btn" onclick="setcat('pastas',this)">🍝 Pastas</button>
+    <button class="cat-btn" onclick="setcat('cocteles',this)">🍹 Cócteles</button>
+    <button class="cat-btn" onclick="setcat('promos',this)">🎁 Promos</button>
+  </div>
+
+  <div class="menu-list scrollable">
+
+    <!-- PIZZAS -->
+    <div class="cat-section active" id="cat-pizzas">
+      <div class="cat-title">Pizzas Napolitanas</div>
+      <div class="item-row" onclick="addItem('Margherita','$9.800',9800,'imagenes/marg.jpg')">
+        <img class="item-img" src="imagenes/marg.jpg" alt="Margherita">
+        <div class="item-info">
+          <div class="item-name">Margherita</div>
+          <div class="item-desc">Tomate San Marzano, fior di latte, albahaca fresca</div>
+          <div class="item-tags"><span class="itag itag-v">🌱 Vegana</span></div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$9.800</div>
+          <button class="add-btn" id="add-Margherita">+</button>
+        </div>
+      </div>
+      <div class="item-row" onclick="addItem('Diavola','$12.800',12800,'imagenes/diav.jpg')">
+        <img class="item-img" src="imagenes/diav.jpg" alt="Diavola">
+        <div class="item-info">
+          <div class="item-name">Diavola</div>
+          <div class="item-desc">Salami picante, tomate, mozzarella, guindilla</div>
+          <div class="item-tags"><span class="itag itag-s">🌶️ Picante</span></div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$12.800</div>
+          <button class="add-btn" id="add-Diavola">+</button>
+        </div>
+      </div>
+      <div class="item-row" onclick="addItem('Mortadella e Pistacchio','$13.800',13800,'imagenes/mort.jpg')">
+        <img class="item-img" src="imagenes/mort.jpg" alt="Mortadella">
+        <div class="item-info">
+          <div class="item-name">Mortadella e Pistacchio</div>
+          <div class="item-desc">Mortadela artesanal, crema de pistacho, base blanca</div>
+          <div class="item-tags"><span class="itag itag-g">⭐ Firma DiMOE</span></div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$13.800</div>
+          <button class="add-btn" id="add-Mortadella e Pistacchio">+</button>
+        </div>
+      </div>
+      <div class="item-row" onclick="addItem('Pecatto di Trufa','$12.500',12500,'imagenes/trufa.jpg')">
+        <img class="item-img" src="imagenes/trufa.jpg" alt="Trufa">
+        <div class="item-info">
+          <div class="item-name">Pecatto di Trufa</div>
+          <div class="item-desc">Base blanca, aceite trufado, parmigiano, champiñones</div>
+          <div class="item-tags"><span class="itag itag-v">🌱 Vegana</span></div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$12.500</div>
+          <button class="add-btn" id="add-Pecatto di Trufa">+</button>
+        </div>
+      </div>
+      <div class="item-row" onclick="addItem('Catalina Salmón','$14.900',14900,'imagenes/salm.jpg')">
+        <img class="item-img" src="imagenes/salm.jpg" alt="Salmón">
+        <div class="item-info">
+          <div class="item-name">Catalina Salmón</div>
+          <div class="item-desc">Salmón ahumado, alcaparras, crema, cebolla morada</div>
+          <div class="item-tags"><span class="itag itag-g">⭐ Especial</span></div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$14.900</div>
+          <button class="add-btn" id="add-Catalina Salmón">+</button>
+        </div>
+      </div>
+      <div class="item-row" onclick="addItem('Prosciutto e Rucola','$13.200',13200,'imagenes/prosc.jpg')">
+        <img class="item-img" src="imagenes/prosc.jpg" alt="Prosciutto">
+        <div class="item-info">
+          <div class="item-name">Prosciutto e Rucola</div>
+          <div class="item-desc">Prosciutto crudo, rúcula fresca, reducción de balsámico</div>
+          <div class="item-tags"><span class="itag itag-g">⭐ Favorita</span></div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$13.200</div>
+          <button class="add-btn" id="add-Prosciutto e Rucola">+</button>
+        </div>
+      </div>
+      <div class="item-row" onclick="addItem('Del Nonno','$11.500',11500,'imagenes/nonno.jpg')">
+        <img class="item-img" src="imagenes/nonno.jpg" alt="Del Nonno">
+        <div class="item-info">
+          <div class="item-name">Del Nonno</div>
+          <div class="item-desc">La receta del abuelo, base de tomate napolitano</div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$11.500</div>
+          <button class="add-btn" id="add-Del Nonno">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRADAS -->
+    <div class="cat-section" id="cat-entradas">
+      <div class="cat-title">Entradas</div>
+      <div class="item-row" onclick="addItem('Palitos al Aglio','$6.900',6900,'imagenes/palito.jpg')">
+        <img class="item-img" src="imagenes/palito.jpg" alt="Palitos">
+        <div class="item-info">
+          <div class="item-name">Palitos al Aglio</div>
+          <div class="item-desc">Pan artesanal, aceite de ajo, hierbas, parmigiano</div>
+          <div class="item-tags"><span class="itag itag-v">🌱 Vegana</span></div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$6.900</div>
+          <button class="add-btn" id="add-Palitos al Aglio">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASTAS -->
+    <div class="cat-section" id="cat-pastas">
+      <div class="cat-title">Pastas Artesanales</div>
+      <div class="item-row" onclick="addItem('Pasta Pesto DiMOE','$10.900',10900,'imagenes/pesto.jpg')">
+        <img class="item-img" src="imagenes/pesto.jpg" alt="Pasta Pesto">
+        <div class="item-info">
+          <div class="item-name">Pasta Pesto DiMOE</div>
+          <div class="item-desc">Pesto genovés artesanal, tomates cherry, parmigiano</div>
+          <div class="item-tags"><span class="itag itag-v">🌱 Vegana</span></div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$10.900</div>
+          <button class="add-btn" id="add-Pasta Pesto DiMOE">+</button>
+        </div>
+      </div>
+      <div class="item-row" onclick="addItem('Pasta del Día','$11.500',11500,'imagenes/pollo.jpg')">
+        <img class="item-img" src="imagenes/pollo.jpg" alt="Pasta del día">
+        <div class="item-info">
+          <div class="item-name">Pasta del Día</div>
+          <div class="item-desc">Pasta fresca con ingredientes de temporada. Consultar preparación.</div>
+          <div class="item-tags"><span class="itag itag-g">⭐ Artesanal</span></div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$11.500</div>
+          <button class="add-btn" id="add-Pasta del Día">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- COCTELES -->
+    <div class="cat-section" id="cat-cocteles">
+      <div class="cat-title">Coctelería</div>
+      <div class="item-row" onclick="addItem('Cóctel DiMOE Signature','$8.900',8900,'imagenes/queen.jpg')">
+        <img class="item-img" src="imagenes/queen.jpg" alt="Cóctel">
+        <div class="item-info">
+          <div class="item-name">Cóctel DiMOE Signature</div>
+          <div class="item-desc">Preparación exclusiva del mes con ingredientes frescos</div>
+          <div class="item-tags"><span class="itag" style="background:rgba(139,92,246,.12);color:#8b5cf6">✨ Firma</span></div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$8.900</div>
+          <button class="add-btn" id="add-Cóctel DiMOE Signature">+</button>
+        </div>
+      </div>
+      <div class="item-row" onclick="addItem('Aperol Spritz','$7.500',7500,'imagenes/promo.jpg')">
+        <img class="item-img" src="imagenes/promo.jpg" alt="Aperol">
+        <div class="item-info">
+          <div class="item-name">Aperol Spritz</div>
+          <div class="item-desc">Aperol, prosecco, agua con gas, naranja</div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$7.500</div>
+          <button class="add-btn" id="add-Aperol Spritz">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROMOS -->
+    <div class="cat-section" id="cat-promos">
+      <div class="cat-title">Promociones</div>
+      <div class="item-row" onclick="addItem('Promo TOP','$18.490',18490,'imagenes/promo.jpg')">
+        <img class="item-img" src="imagenes/promo.jpg" alt="Promo TOP">
+        <div class="item-info">
+          <div class="item-name">🏆 Promo TOP</div>
+          <div class="item-desc">La mejor combinación DiMOE. Consulta el contenido al pedir.</div>
+          <div class="item-tags"><span class="itag itag-g">🔥 Más vendido</span></div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$18.490</div>
+          <button class="add-btn" id="add-Promo TOP">+</button>
+        </div>
+      </div>
+      <div class="item-row" onclick="addItem('Promo Familiar','$23.900',23900,'imagenes/marg.jpg')">
+        <img class="item-img" src="imagenes/marg.jpg" alt="Promo Familiar">
+        <div class="item-info">
+          <div class="item-name">👨‍👩‍👧‍👦 Promo Familiar</div>
+          <div class="item-desc">2 pizzas + entrada palitos + bebidas para compartir</div>
+          <div class="item-tags"><span class="itag itag-g">💰 Mejor precio</span></div>
+        </div>
+        <div class="item-right">
+          <div class="item-price">$23.900</div>
+          <button class="add-btn" id="add-Promo Familiar">+</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /menu-list -->
+
+  <!-- CART BAR -->
+  <div class="cart-bar" id="cartBar" onclick="goStep(2)">
+    <div class="cart-bar-left">
+      <div class="cart-count" id="cartCount">0</div>
+      <div class="cart-bar-text">Ver mi pedido</div>
+    </div>
+    <div class="cart-bar-price" id="cartTotal">$0</div>
+  </div>
+</div>
+
+<!-- ============ STEP 2: CARRITO ============ -->
+<div class="step" id="step2">
+  <div class="topbar">
+    <div class="back-btn" onclick="goStep(1)">←</div>
+    <div class="topbar-info">
+      <h2>Tu pedido</h2>
+      <span id="cart-item-count">0 productos</span>
+    </div>
+  </div>
+
+  <div class="scrollable">
+    <div class="cart-list" id="cartList"></div>
+
+    <div class="note-section">
+      <label>Nota para la cocina (opcional)</label>
+      <textarea class="note-input" rows="2" placeholder="Sin picante, sin cebolla, alergia a..."></textarea>
+    </div>
+
+    <div class="coupon-row">
+      <span>🏷️ ¿Tienes un cupón o código Club DiMOE?</span>
+      <span class="arrow">›</span>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-row"><span>Subtotal</span><span id="s-subtotal">$0</span></div>
+      <div class="summary-row"><span>Despacho</span><span id="s-delivery">$1.500</span></div>
+      <div class="summary-row"><span>Descuento Club ⭐</span><span style="color:var(--green)" id="s-discount">−$0</span></div>
+      <div class="summary-row total"><span>Total</span><span id="s-total">$0</span></div>
+    </div>
+  </div>
+
+  <div class="bottom-cta">
+    <button class="cta-btn" onclick="goStep(3)">
+      <span>Continuar al pago</span>
+      <span class="price" id="cta2-total">$0</span>
+    </button>
+  </div>
+</div>
+
+<!-- ============ STEP 3: CHECKOUT ============ -->
+<div class="step" id="step3">
+  <div class="topbar">
+    <div class="back-btn" onclick="goStep(2)">←</div>
+    <div class="topbar-info">
+      <h2>Confirmar pedido</h2>
+      <span>Paso final</span>
+    </div>
+  </div>
+
+  <div class="checkout-body">
+
+    <div class="section-block">
+      <h3>¿Cómo quieres recibirlo?</h3>
+      <div class="type-toggle">
+        <div class="type-opt sel" id="opt-delivery" onclick="selType('delivery')">
+          <span class="emoji">🛵</span>
+          <strong>Delivery</strong>
+          <span>~30–40 min</span>
+        </div>
+        <div class="type-opt" id="opt-pickup" onclick="selType('pickup')">
+          <span class="emoji">🏪</span>
+          <strong>Retiro en local</strong>
+          <span>~15–20 min</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block" id="addr-section">
+      <h3>Dirección de entrega</h3>
+      <div class="addr-box">
+        <div class="addr-icon">📍</div>
+        <div class="addr-info">
+          <strong>Balmaceda 841, Paine</strong>
+          <span>Departamento / referencia: Torre A, Piso 3</span>
+          <span class="addr-change">Cambiar dirección →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Hora de entrega</h3>
+      <div class="time-opts">
+        <div class="time-opt sel" onclick="selTime(this)">Lo antes posible</div>
+        <div class="time-opt" onclick="selTime(this)">20:30</div>
+        <div class="time-opt" onclick="selTime(this)">21:00</div>
+        <div class="time-opt" onclick="selTime(this)">21:30</div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Método de pago</h3>
+      <div class="pay-methods">
+        <div class="pay-opt sel" onclick="selPay(this)">
+          <div class="pay-icon">💳</div>
+          <div class="pay-info"><strong>Webpay / Débito</strong><span>Visa, Mastercard, RedCompra</span></div>
+          <div class="pay-check">✓</div>
+        </div>
+        <div class="pay-opt" onclick="selPay(this)">
+          <div class="pay-icon">📲</div>
+          <div class="pay-info"><strong>Transferencia</strong><span>Banco Estado, Mercado Pago</span></div>
+          <div class="pay-check"></div>
+        </div>
+        <div class="pay-opt" onclick="selPay(this)">
+          <div class="pay-icon">💵</div>
+          <div class="pay-info"><strong>Efectivo</strong><span>Paga al recibir tu pedido</span></div>
+          <div class="pay-check"></div>
+        </div>
+        <div class="pay-opt" onclick="selPay(this)">
+          <div class="pay-icon">🔳</div>
+          <div class="pay-info"><strong>Código QR</strong><span>Escanea y paga en segundos</span></div>
+          <div class="pay-check"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Resumen del pedido</h3>
+      <div class="order-summary-mini" id="osMini"></div>
+      <div class="summary-box" style="padding:0;margin-top:14px">
+        <div class="summary-row"><span>Subtotal</span><span id="s3-sub">$0</span></div>
+        <div class="summary-row"><span>Despacho</span><span>$1.500</span></div>
+        <div class="summary-row total"><span>Total a pagar</span><span id="s3-total">$0</span></div>
+      </div>
+    </div>
+
+    <div style="padding:0 16px 8px">
+      <div style="background:rgba(37,211,102,.06);border:1px solid rgba(37,211,102,.18);border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:center">
+        <span style="font-size:20px">💬</span>
+        <span style="font-size:12px;color:var(--text2)">Recibirás <strong style="color:var(--text)">confirmación por WhatsApp</strong> al instante con los detalles de tu pedido.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-cta">
+    <button class="cta-btn" onclick="goStep(4)">
+      <span>Confirmar y pagar</span>
+      <span class="price" id="cta3-total">$0</span>
+    </button>
+  </div>
+</div>
+
+<!-- ============ STEP 4: CONFIRMACIÓN ============ -->
+<div class="step" id="step4">
+  <div class="scrollable confirm-step">
+
+    <div class="confirm-hero">
+      <span class="confirm-icon">✅</span>
+      <h2>¡Pedido confirmado!</h2>
+      <p>DiMOE está preparando tu pedido</p>
+      <div class="order-num-badge">🍕 Pedido #DM-2851</div>
+    </div>
+
+    <div class="eta-bar">
+      <div class="eta-num" id="etaCount">32</div>
+      <div class="eta-label">minutos estimados para entrega</div>
+    </div>
+
+    <div class="tracking-box">
+      <h3>Seguimiento en tiempo real</h3>
+      <div class="track-steps">
+        <div class="ts done">
+          <div class="ts-dot-wrap"><div class="ts-dot">✓</div><div class="ts-line"></div></div>
+          <div class="ts-info"><div class="ts-title">Pedido recibido</div><div class="ts-sub">DiMOE recibió tu pedido · ahora mismo</div></div>
+        </div>
+        <div class="ts active">
+          <div class="ts-dot-wrap"><div class="ts-dot">🍕</div><div class="ts-line"></div></div>
+          <div class="ts-info"><div class="ts-title">En preparación</div><div class="ts-sub">Nuestro equipo está cocinando · en progreso</div></div>
+        </div>
+        <div class="ts pend">
+          <div class="ts-dot-wrap"><div class="ts-dot">🔥</div><div class="ts-line"></div></div>
+          <div class="ts-info"><div class="ts-title">En el horno napolitano</div><div class="ts-sub">Estimado: ~15 minutos</div></div>
+        </div>
+        <div class="ts pend">
+          <div class="ts-dot-wrap"><div class="ts-dot">📦</div><div class="ts-line"></div></div>
+          <div class="ts-info"><div class="ts-title">Listo para despacho</div><div class="ts-sub">Estimado: ~25 minutos</div></div>
+        </div>
+        <div class="ts pend">
+          <div class="ts-dot-wrap"><div class="ts-dot">🛵</div></div>
+          <div class="ts-info"><div class="ts-title">En camino</div><div class="ts-sub">Tu repartidor va en ruta</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wa-confirm">
+      <div class="wa-icon">💬</div>
+      <div class="wa-confirm-text">
+        <strong>Confirmación enviada por WhatsApp</strong>
+        <span>Recibirás actualizaciones en cada etapa de tu pedido al +56 9 8812 3456</span>
+      </div>
+    </div>
+
+    <div class="confirm-actions">
+      <button class="btn-full btn-gold" onclick="goStep(1)">Hacer otro pedido 🍕</button>
+      <a href="https://api.whatsapp.com/send/?phone=%2B56973694101" target="_blank" style="text-decoration:none">
+        <button class="btn-full btn-outline">Contactar a DiMOE 💬</button>
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// CART STATE
+let cart = [];
+
+function setcat(id, el) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.cat-section').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('cat-' + id).classList.add('active');
+}
+
+function fmt(n) { return '$' + n.toLocaleString('es-CL'); }
+
+function totalItems() { return cart.reduce((s, i) => s + i.qty, 0); }
+function totalPrice() { return cart.reduce((s, i) => s + i.price * i.qty, 0); }
+
+function updateCartBar() {
+  const n = totalItems();
+  const t = totalPrice();
+  const bar = document.getElementById('cartBar');
+  document.getElementById('cartCount').textContent = n;
+  document.getElementById('cartTotal').textContent = fmt(t);
+  bar.classList.toggle('show', n > 0);
+}
+
+function addItem(name, priceStr, price, img) {
+  const existing = cart.find(i => i.name === name);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({ name, priceStr, price, img, qty: 1 });
+  }
+  updateCartBar();
+  showToast('🍕 ' + name + ' agregada');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function goStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  window.scrollTo(0, 0);
+  if (n === 2) renderCart();
+  if (n === 3) renderCheckout();
+  if (n === 4) startTracking();
+}
+
+function renderCart() {
+  const list = document.getElementById('cartList');
+  document.getElementById('cart-item-count').textContent = totalItems() + ' producto' + (totalItems() !== 1 ? 's' : '');
+  list.innerHTML = cart.map((item, idx) => `
+    <div class="cart-item">
+      <img class="cart-item-img" src="${item.img}" alt="${item.name}" onerror="this.src='imagenes/logo.png'">
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">${item.priceStr}</div>
+      </div>
+      <div class="cart-item-ctrl">
+        <button class="c-btn" onclick="changeQty(${idx},-1)">−</button>
+        <span class="c-num">${item.qty}</span>
+        <button class="c-btn" onclick="changeQty(${idx},1)">+</button>
+      </div>
+    </div>`).join('');
+  updateSummary();
+}
+
+function changeQty(idx, delta) {
+  cart[idx].qty += delta;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  updateCartBar();
+  renderCart();
+  if (cart.length === 0) goStep(1);
+}
+
+function updateSummary() {
+  const sub = totalPrice();
+  const delivery = 1500;
+  const discount = 0;
+  const total = sub + delivery - discount;
+  document.getElementById('s-subtotal').textContent = fmt(sub);
+  document.getElementById('s-total').textContent = fmt(total);
+  document.getElementById('cta2-total').textContent = fmt(total);
+}
+
+function renderCheckout() {
+  const mini = document.getElementById('osMini');
+  mini.innerHTML = cart.map(i => `
+    <div class="osm-item">
+      <div class="osm-qty">${i.qty}</div>
+      <div class="osm-name">${i.name}</div>
+      <div class="osm-price">${fmt(i.price * i.qty)}</div>
+    </div>`).join('');
+  const sub = totalPrice();
+  const total = sub + 1500;
+  document.getElementById('s3-sub').textContent = fmt(sub);
+  document.getElementById('s3-total').textContent = fmt(total);
+  document.getElementById('cta3-total').textContent = fmt(total);
+}
+
+function selType(type) {
+  document.getElementById('opt-delivery').classList.toggle('sel', type === 'delivery');
+  document.getElementById('opt-pickup').classList.toggle('sel', type === 'pickup');
+  document.getElementById('addr-section').style.display = type === 'delivery' ? 'block' : 'none';
+}
+
+function selTime(el) {
+  document.querySelectorAll('.time-opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function selPay(el) {
+  document.querySelectorAll('.pay-opt').forEach(o => {
+    o.classList.remove('sel');
+    o.querySelector('.pay-check').textContent = '';
+  });
+  el.classList.add('sel');
+  el.querySelector('.pay-check').textContent = '✓';
+}
+
+// TRACKING COUNTDOWN
+function startTracking() {
+  let eta = 32;
+  const el = document.getElementById('etaCount');
+  const iv = setInterval(() => {
+    eta--;
+    if (el) el.textContent = eta;
+    if (eta <= 0) clearInterval(iv);
+  }, 3000);
+}
+
+// Init with sample item for demo
+window.onload = () => {
+  addItem('Mortadella e Pistacchio', '$13.800', 13800, 'imagenes/mort.jpg');
+  addItem('Margherita', '$9.800', 9800, 'imagenes/marg.jpg');
+};
+</script>
+</body>
+</html>
