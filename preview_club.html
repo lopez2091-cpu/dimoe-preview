@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiMOE · Club — Vista Previa Rediseño</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap');
+:root{
+  --gold:#c8922a;--gold-l:#e8b84b;--cream:#f5f0e8;
+  --dark:#0e0c09;--dark2:#181410;--dark3:#221d14;
+  --muted:#8a7f6a;--border:rgba(200,146,42,0.2);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--cream);}
+
+.preview-bar{
+  background:rgba(200,146,42,.95);color:var(--dark);
+  padding:9px;text-align:center;font-size:10px;font-weight:800;
+  letter-spacing:.12em;text-transform:uppercase;
+}
+
+/* ===== SECCIÓN ===== */
+.clubsec{
+  padding:100px 48px;
+  background: var(--dark);
+  position:relative;overflow:hidden;
+}
+.clubsec::before{
+  content:'';position:absolute;top:-200px;right:-200px;
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,146,42,.04),transparent 70%);
+  pointer-events:none;
+}
+.clubin{max-width:1100px;margin:0 auto;}
+
+/* HEADER */
+.club-head{text-align:center;max-width:640px;margin:0 auto 72px;}
+.lbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.club-head h2{font-family:'Playfair Display',serif;font-size:clamp(36px,5vw,58px);font-weight:900;line-height:1.05;margin-bottom:16px;}
+.club-head h2 em{font-style:italic;color:var(--gold);}
+.club-head p{font-size:14px;color:var(--muted);line-height:1.75;max-width:500px;margin:0 auto 28px;}
+.club-stats{display:flex;gap:40px;justify-content:center;}
+.cstat .n{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--gold);}
+.cstat .l{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+
+/* JOURNEY / NIVELES */
+.journey{
+  position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  margin-bottom:80px;
+}
+/* línea conectora */
+.journey::before{
+  content:'';position:absolute;top:52px;left:12.5%;right:12.5%;
+  height:2px;background:linear-gradient(90deg,
+    #7a5030 0%, #7a5030 25%,
+    #7a8590 25%, #7a8590 50%,
+    var(--gold) 50%, var(--gold) 75%,
+    #8b45cc 75%, #8b45cc 100%
+  );
+  z-index:0;
+}
+
+.jlv{
+  display:flex;flex-direction:column;align-items:center;
+  padding:0 10px;text-align:center;position:relative;z-index:1;
+}
+
+/* badge circular */
+.jbadge{
+  width:104px;height:104px;border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  margin-bottom:22px;position:relative;transition:transform .25s;
+  cursor:default;
+}
+.jbadge:hover{transform:scale(1.07);}
+.jlv-b .jbadge{background:linear-gradient(145deg,#3d2b1a,#1e1008);border:2px solid #7a5030;box-shadow:0 8px 32px rgba(122,80,48,.25);}
+.jlv-s .jbadge{background:linear-gradient(145deg,#2c2f32,#14181a);border:2px solid #7a8590;box-shadow:0 8px 32px rgba(122,133,144,.2);}
+.jlv-g .jbadge{background:linear-gradient(145deg,#3a2c08,#1a1404);border:2px solid var(--gold);box-shadow:0 8px 32px rgba(200,146,42,.3);}
+.jlv-v .jbadge{background:linear-gradient(145deg,#1e0d2e,#0e0618);border:2px solid #8b45cc;box-shadow:0 8px 32px rgba(139,69,204,.3);}
+
+.jbadge-icon{font-size:32px;line-height:1;margin-bottom:3px;}
+.jbadge-stars{font-size:10px;letter-spacing:1px;}
+.jlv-b .jbadge-stars{color:#c8845a}
+.jlv-s .jbadge-stars{color:#a0aab4}
+.jlv-g .jbadge-stars{color:var(--gold)}
+.jlv-v .jbadge-stars{color:#b07ad4}
+
+.jlv-name{
+  font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;
+  margin-bottom:10px;
+}
+.jlv-b .jlv-name{color:#c8845a}
+.jlv-s .jlv-name{color:#a0aab4}
+.jlv-g .jlv-name{color:var(--gold)}
+.jlv-v .jlv-name{color:#b07ad4}
+
+.jlv-req{
+  font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:10px;
+}
+.jlv-b .jlv-req{color:#c8845a}
+.jlv-s .jlv-req{color:#a0aab4}
+.jlv-g .jlv-req{color:var(--gold)}
+.jlv-v .jlv-req{color:#b07ad4}
+
+.jlv-perks{
+  display:flex;flex-direction:column;gap:5px;
+  background:var(--dark2);border:1px solid var(--border);
+  border-radius:8px;padding:14px 16px;width:100%;text-align:left;margin-top:4px;
+}
+.jlv-perk{
+  display:flex;align-items:flex-start;gap:7px;font-size:11.5px;color:var(--muted);line-height:1.45;
+}
+.jlv-perk::before{content:'—';color:var(--border);flex-shrink:0;font-size:9px;margin-top:2px;}
+.jlv-g .jlv-perk::before{color:rgba(200,146,42,.4);}
+.jlv-v .jlv-perk::before{color:rgba(139,69,204,.4);}
+
+/* CÓMO FUNCIONA — timeline horizontal */
+.how-title{
+  text-align:center;font-size:10px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--muted);margin-bottom:40px;
+}
+.how-steps{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  position:relative;margin-bottom:80px;
+}
+.how-steps::before{
+  content:'';position:absolute;top:22px;left:calc(12.5% + 11px);right:calc(12.5% + 11px);
+  height:1px;background:var(--border);z-index:0;
+}
+.hstep{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:0 12px;position:relative;z-index:1;
+}
+.hnum{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--dark3);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:var(--gold);
+  margin-bottom:16px;
+}
+.hstep-icon{font-size:22px;margin-bottom:10px;}
+.hstep-text{font-size:12.5px;color:var(--muted);line-height:1.55;}
+.hstep-text strong{display:block;color:var(--cream);font-size:13px;margin-bottom:3px;}
+
+/* MEMBERSHIP CARD — nuevo diseño premium */
+.card-wrap{
+  display:grid;grid-template-columns:1fr 1fr;gap:48px;
+  align-items:center;
+  background:var(--dark2);border:1px solid var(--border);
+  border-radius:16px;padding:48px;margin-bottom:20px;
+}
+.card-copy h3{
+  font-family:'Playfair Display',serif;font-size:28px;font-weight:900;
+  margin-bottom:10px;
+}
+.card-copy h3 em{font-style:italic;color:var(--gold);}
+.card-copy p{font-size:13.5px;color:var(--muted);line-height:1.75;margin-bottom:24px;}
+.card-copy-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-g{
+  background:var(--gold);color:var(--dark);
+  padding:14px 28px;border-radius:2px;
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:.2s;
+}
+.btn-g:hover{background:var(--gold-l);}
+.btn-o{
+  background:transparent;color:var(--cream);
+  padding:14px 28px;border-radius:2px;
+  font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;border:1px solid rgba(245,240,232,.2);font-family:'Inter',sans-serif;transition:.2s;
+}
+.btn-o:hover{border-color:var(--gold);color:var(--gold);}
+
+/* La tarjeta física rediseñada */
+.mem-card{
+  width:100%;max-width:380px;margin:0 auto;
+  aspect-ratio:1.586/1;border-radius:18px;
+  background:linear-gradient(135deg,#1a1205 0%,#2e1f06 40%,#0e0c09 100%);
+  border:1px solid rgba(200,146,42,.3);
+  padding:28px;display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(200,146,42,.12);
+}
+/* efecto brillo holográfico */
+.mem-card::before{
+  content:'';position:absolute;top:-60%;left:-60%;
+  width:160%;height:160%;
+  background:conic-gradient(from 200deg at 60% 40%,
+    transparent 0deg,rgba(200,146,42,.04) 30deg,
+    transparent 60deg,rgba(200,146,42,.06) 90deg,
+    transparent 120deg
+  );
+  animation:shimmer 6s linear infinite;
+  pointer-events:none;
+}
+@keyframes shimmer{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+/* líneas decorativas */
+.mem-card::after{
+  content:'';position:absolute;bottom:0;right:0;
+  width:200px;height:200px;
+  background:radial-gradient(circle at 100% 100%,rgba(200,146,42,.08),transparent 60%);
+  pointer-events:none;
+}
+
+.mc-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.mc-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--gold-l);}
+.mc-logo span{font-style:italic;}
+.mc-level-badge{
+  background:rgba(200,146,42,.15);border:1px solid rgba(200,146,42,.35);
+  border-radius:99px;padding:4px 12px;
+  font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold-l);
+}
+.mc-mid{margin-top:auto;}
+.mc-name-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.mc-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--cream);}
+.mc-bottom{display:flex;justify-content:space-between;align-items:flex-end;}
+.mc-stars-wrap{display:flex;flex-direction:column;gap:6px;}
+.mc-stars-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.mc-stars{display:flex;gap:4px;}
+.mc-star{
+  width:18px;height:18px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:9px;
+}
+.mc-star.on{background:var(--gold);}
+.mc-star.off{background:rgba(200,146,42,.15);border:1px solid rgba(200,146,42,.2);}
+.mc-next{text-align:right;}
+.mc-next-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:var(--gold);line-height:1;}
+.mc-next-txt{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
+.mc-wallet-row{
+  display:flex;gap:7px;margin-top:8px;align-items:center;
+}
+.mc-wallet-icon{
+  width:24px;height:24px;background:var(--dark3);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;font-size:12px;border:1px solid var(--border);
+}
+.mc-wallet-txt{font-size:10px;color:var(--muted);}
+
+.card-foot-note{
+  text-align:center;font-size:11px;color:var(--muted);
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .clubsec{padding:60px 20px;}
+  .journey{grid-template-columns:1fr 1fr;gap:28px;}
+  .journey::before{display:none;}
+  .how-steps{grid-template-columns:1fr 1fr;gap:28px;}
+  .how-steps::before{display:none;}
+  .card-wrap{grid-template-columns:1fr;gap:36px;}
+  .club-stats{gap:24px;}
+}
+@media(max-width:600px){
+  .journey{grid-template-columns:1fr;}
+  .how-steps{grid-template-columns:1fr 1fr;}
+  .club-head h2{font-size:32px;}
+}
+</style>
+</head>
+<body>
+
+<div class="preview-bar">⚠️ Vista previa — rediseño Club DiMOE · Sin cambios al original</div>
+
+<div class="clubsec">
+<div class="clubin">
+
+  <!-- HEADER -->
+  <div class="club-head">
+    <div class="lbl">Programa de Fidelización</div>
+    <h2>Club <em>DiMOE</em></h2>
+    <p>Cada visita suma. Cada pizza cuenta. Acumula estrellas y desbloquea beneficios exclusivos que crecen con tu lealtad.</p>
+    <div class="club-stats">
+      <div class="cstat"><div class="n">342</div><div class="l">Miembros activos</div></div>
+      <div class="cstat"><div class="n">87</div><div class="l">Pizzas canjeadas este mes</div></div>
+      <div class="cstat"><div class="n">Gratis</div><div class="l">Inscripción</div></div>
+    </div>
+  </div>
+
+  <!-- JOURNEY DE NIVELES -->
+  <div class="journey">
+
+    <div class="jlv jlv-b">
+      <div class="jbadge">
+        <div class="jbadge-icon">🥉</div>
+        <div class="jbadge-stars">1 – 4 ★</div>
+      </div>
+      <div class="jlv-name">Bronce</div>
+      <div class="jlv-req">1–4 ⭐</div>
+      <div class="jlv-perks">
+        <div class="jlv-perk">Descuento en cumpleaños</div>
+        <div class="jlv-perk">Acceso a promos del mes</div>
+        <div class="jlv-perk">Newsletter exclusiva</div>
+      </div>
+    </div>
+
+    <div class="jlv jlv-s">
+      <div class="jbadge">
+        <div class="jbadge-icon">🥈</div>
+        <div class="jbadge-stars">5 – 9 ★</div>
+      </div>
+      <div class="jlv-name">Plata</div>
+      <div class="jlv-req">5–9 ⭐</div>
+      <div class="jlv-perks">
+        <div class="jlv-perk">🍕 Pizza gratis al llegar</div>
+        <div class="jlv-perk">Postre en cumpleaños</div>
+        <div class="jlv-perk">Reserva con prioridad</div>
+      </div>
+    </div>
+
+    <div class="jlv jlv-g">
+      <div class="jbadge">
+        <div class="jbadge-icon">🥇</div>
+        <div class="jbadge-stars">10 – 19 ★</div>
+      </div>
+      <div class="jlv-name">Oro</div>
+      <div class="jlv-req">10–19 ⭐</div>
+      <div class="jlv-perks">
+        <div class="jlv-perk">10% de descuento siempre</div>
+        <div class="jlv-perk">Acceso a eventos DiMOE</div>
+        <div class="jlv-perk">Maridaje de cortesía</div>
+      </div>
+    </div>
+
+    <div class="jlv jlv-v">
+      <div class="jbadge">
+        <div class="jbadge-icon">👑</div>
+        <div class="jbadge-stars">20+ ★</div>
+      </div>
+      <div class="jlv-name">VIP</div>
+      <div class="jlv-req">20+ ⭐</div>
+      <div class="jlv-perks">
+        <div class="jlv-perk">Mesa preferencial fija</div>
+        <div class="jlv-perk">Degustación exclusiva</div>
+        <div class="jlv-perk">Tu nombre en DiMOE 🏅</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CÓMO FUNCIONA -->
+  <div class="how-title">Cómo funciona</div>
+  <div class="how-steps">
+    <div class="hstep">
+      <div class="hnum">1</div>
+      <div class="hstep-icon">📱</div>
+      <div class="hstep-text"><strong>Regístrate gratis</strong>Desde la web en 30 segundos</div>
+    </div>
+    <div class="hstep">
+      <div class="hnum">2</div>
+      <div class="hstep-icon">💳</div>
+      <div class="hstep-text"><strong>Agrega a tu Wallet</strong>Apple Wallet o Google Wallet</div>
+    </div>
+    <div class="hstep">
+      <div class="hnum">3</div>
+      <div class="hstep-icon">⭐</div>
+      <div class="hstep-text"><strong>Gana estrellas</strong>En cada visita y pedido online</div>
+    </div>
+    <div class="hstep">
+      <div class="hnum">4</div>
+      <div class="hstep-icon">🎁</div>
+      <div class="hstep-text"><strong>Canjea beneficios</strong>Pizzas, descuentos y experiencias</div>
+    </div>
+  </div>
+
+  <!-- TARJETA + CTA -->
+  <div class="card-wrap">
+
+    <!-- Tarjeta rediseñada -->
+    <div>
+      <div class="mem-card">
+        <div class="mc-top">
+          <div class="mc-logo">Di<span>MOE</span></div>
+          <div class="mc-level-badge">🥈 Plata</div>
+        </div>
+        <div class="mc-mid" style="margin-top:24px">
+          <div class="mc-name-label">Titular</div>
+          <div class="mc-name">María González</div>
+        </div>
+        <div class="mc-bottom">
+          <div class="mc-stars-wrap">
+            <div class="mc-stars-label">Estrellas acumuladas</div>
+            <div class="mc-stars">
+              <div class="mc-star on">⭐</div>
+              <div class="mc-star on">⭐</div>
+              <div class="mc-star on">⭐</div>
+              <div class="mc-star on">⭐</div>
+              <div class="mc-star off"></div>
+            </div>
+            <div class="mc-wallet-row">
+              <div class="mc-wallet-icon">🍎</div>
+              <div class="mc-wallet-icon">🤖</div>
+              <div class="mc-wallet-txt">Disponible en Apple & Google Wallet</div>
+            </div>
+          </div>
+          <div class="mc-next">
+            <div class="mc-next-num">4</div>
+            <div class="mc-next-txt">1 más = 🍕 gratis</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Copy + CTA -->
+    <div class="card-copy">
+      <h3>Tu tarjeta,<br>siempre <em>contigo</em></h3>
+      <p>Una membresía digital que vive en tu teléfono. Sin plástico, sin papeles. Cada vez que visitas DiMOE, tu estrella aparece automáticamente.</p>
+      <div class="card-copy-btns">
+        <button class="btn-g">Unirme al Club</button>
+        <button class="btn-o">Ver beneficios</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card-foot-note">Tarjeta digital en Apple Wallet y Google Wallet · Sin costo · Para todos los clientes</div>
+
+</div>
+</div>
+
+</body>
+</html>
