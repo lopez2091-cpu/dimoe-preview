@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiMOE CRM — Panel de Gestión</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #161b27;
+    --bg3: #1e2535;
+    --border: #2a3347;
+    --accent: #e8b84b;
+    --accent2: #c9963a;
+    --text: #e8eaf0;
+    --text2: #8b95a8;
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --orange: #f97316;
+    --sidebar: 240px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; font-size: 14px; }
+
+  /* SIDEBAR */
+  #sidebar {
+    width: var(--sidebar); background: var(--bg2); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto;
+  }
+  .logo-wrap { padding: 20px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .logo-wrap img { width: 36px; height: 36px; border-radius: 8px; object-fit: contain; background: #fff; padding: 2px; }
+  .logo-text { line-height: 1.2; }
+  .logo-text strong { font-size: 15px; color: var(--accent); display: block; }
+  .logo-text span { font-size: 11px; color: var(--text2); }
+  .nav-group { padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .nav-label { font-size: 10px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .08em; padding: 0 18px 6px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 18px;
+    cursor: pointer; color: var(--text2); transition: all .15s; border-left: 3px solid transparent;
+    font-size: 13.5px;
+  }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active { background: rgba(232,184,75,.08); color: var(--accent); border-left-color: var(--accent); }
+  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-badge { margin-left: auto; background: var(--red); color: #fff; border-radius: 10px; font-size: 10px; padding: 1px 6px; font-weight: 700; }
+  .nav-badge.green { background: var(--green); }
+  .sidebar-footer { margin-top: auto; padding: 14px 18px; border-top: 1px solid var(--border); }
+  .user-card { display: flex; align-items: center; gap: 10px; }
+  .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #000; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+  .user-info { line-height: 1.3; }
+  .user-info strong { font-size: 13px; display: block; }
+  .user-info span { font-size: 11px; color: var(--text2); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); margin-left: auto; }
+
+  /* MAIN */
+  #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar {
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    padding: 0 24px; height: 56px; display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+  }
+  .topbar-title { font-size: 18px; font-weight: 700; flex: 1; }
+  .topbar-title span { font-size: 13px; color: var(--text2); font-weight: 400; margin-left: 8px; }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+  .btn { padding: 7px 14px; border-radius: 7px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: all .15s; }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-green { background: var(--green); color: #fff; }
+  .btn-red { background: var(--red); color: #fff; }
+  .notif-btn { background: var(--bg3); border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; font-size: 16px; }
+  .notif-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; background: var(--red); border-radius: 50%; }
+  .live-badge { background: rgba(46,204,113,.15); border: 1px solid var(--green); color: var(--green); border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+  .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* CONTENT */
+  #content { flex: 1; overflow-y: auto; padding: 24px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+  .kpi-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .05em; }
+  .kpi-value { font-size: 28px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+  .kpi-meta { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 4px; }
+  .kpi-meta .up { color: var(--green); }
+  .kpi-meta .down { color: var(--red); }
+  .kpi-icon { float: right; font-size: 28px; opacity: .5; margin-top: -4px; }
+
+  /* TWO COL */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+  .card-title { font-size: 14px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+  .card-title .tag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; }
+  .tag-green { background: rgba(46,204,113,.15); color: var(--green); }
+  .tag-orange { background: rgba(249,115,22,.15); color: var(--orange); }
+  .tag-blue { background: rgba(59,130,246,.15); color: var(--blue); }
+  .tag-purple { background: rgba(139,92,246,.15); color: var(--purple); }
+  .tag-yellow { background: rgba(232,184,75,.15); color: var(--accent); }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 10px 12px; font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--border); font-weight: 600; }
+  td { padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 13px; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+
+  /* STATUS PILLS */
+  .pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .pill-green { background: rgba(46,204,113,.15); color: var(--green); }
+  .pill-red { background: rgba(231,76,60,.15); color: var(--red); }
+  .pill-orange { background: rgba(249,115,22,.15); color: var(--orange); }
+  .pill-blue { background: rgba(59,130,246,.15); color: var(--blue); }
+  .pill-purple { background: rgba(139,92,246,.15); color: var(--purple); }
+  .pill-gray { background: rgba(139,149,168,.15); color: var(--text2); }
+  .pill-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+  /* TIMELINE/ORDERS */
+  .order-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+  .order-item:last-child { border-bottom: none; }
+  .order-num { font-size: 11px; font-weight: 700; color: var(--accent); min-width: 40px; }
+  .order-info { flex: 1; }
+  .order-info strong { font-size: 13px; display: block; margin-bottom: 2px; }
+  .order-info span { font-size: 11px; color: var(--text2); }
+  .order-price { font-weight: 700; color: var(--text); font-size: 14px; }
+  .order-time { font-size: 11px; color: var(--text2); text-align: right; }
+
+  /* BAR CHART */
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 100px; padding-top: 8px; }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; background: var(--accent); opacity: .7; transition: opacity .2s; }
+  .bar:hover { opacity: 1; }
+  .bar-label { font-size: 10px; color: var(--text2); }
+
+  /* GAUGE / MINI STATS */
+  .mini-stat { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+  .mini-stat:last-child { border-bottom: none; }
+  .mini-stat-label { font-size: 13px; color: var(--text2); }
+  .mini-stat-val { font-size: 14px; font-weight: 700; }
+  .progress-bar { height: 4px; background: var(--bg3); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 2px; background: var(--accent); }
+
+  /* RESERVAS */
+  .reserva-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+  .reserva-row:last-child { border-bottom: none; }
+  .reserva-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: var(--accent); flex-shrink: 0; }
+  .reserva-info { flex: 1; }
+  .reserva-info strong { display: block; font-size: 13px; margin-bottom: 1px; }
+  .reserva-info span { font-size: 11px; color: var(--text2); }
+  .reserva-meta { text-align: right; font-size: 12px; }
+  .reserva-meta strong { display: block; margin-bottom: 2px; }
+  .reserva-meta span { color: var(--text2); }
+
+  /* AGENDA GRID */
+  .agenda-grid { display: grid; grid-template-columns: 60px repeat(7, 1fr); gap: 1px; background: var(--border); border-radius: 8px; overflow: hidden; }
+  .ag-cell { background: var(--bg2); padding: 8px; font-size: 11px; min-height: 36px; }
+  .ag-header { background: var(--bg3); font-weight: 700; text-align: center; color: var(--text2); font-size: 11px; }
+  .ag-hour { color: var(--text2); font-size: 10px; display: flex; align-items: flex-start; justify-content: flex-end; padding-right: 6px; }
+  .ag-event { background: rgba(232,184,75,.15); border-left: 3px solid var(--accent); border-radius: 4px; padding: 4px 6px; font-size: 10px; color: var(--text); margin-bottom: 2px; cursor: pointer; }
+  .ag-event:hover { background: rgba(232,184,75,.25); }
+  .ag-event.blue { background: rgba(59,130,246,.15); border-left-color: var(--blue); }
+  .ag-event.green { background: rgba(46,204,113,.15); border-left-color: var(--green); }
+  .ag-event.red { background: rgba(231,76,60,.15); border-left-color: var(--red); }
+
+  /* CLUB */
+  .club-member { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+  .club-member:last-child { border-bottom: none; }
+  .tier-badge { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .tier-gold { background: rgba(232,184,75,.2); }
+  .tier-silver { background: rgba(139,149,168,.2); }
+  .tier-bronze { background: rgba(180,100,50,.2); }
+  .club-info { flex: 1; }
+  .club-info strong { display: block; font-size: 13px; margin-bottom: 1px; }
+  .club-info span { font-size: 11px; color: var(--text2); }
+  .club-pts { text-align: right; }
+  .club-pts strong { display: block; font-size: 15px; color: var(--accent); }
+  .club-pts span { font-size: 10px; color: var(--text2); }
+
+  /* PAGOS */
+  .pago-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+  .pago-row:last-child { border-bottom: none; }
+  .pago-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .pago-info { flex: 1; }
+  .pago-info strong { display: block; font-size: 13px; }
+  .pago-info span { font-size: 11px; color: var(--text2); }
+  .pago-amount { font-weight: 700; font-size: 14px; }
+  .pago-amount.income { color: var(--green); }
+  .pago-amount.refund { color: var(--red); }
+
+  /* TOOLTIP */
+  .tooltip { position: relative; }
+  .tooltip:hover::after {
+    content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-size: 11px;
+    padding: 4px 8px; border-radius: 6px; white-space: nowrap; z-index: 99; pointer-events: none;
+  }
+
+  /* MAP placeholder */
+  .map-placeholder { background: var(--bg3); border-radius: 8px; height: 160px; display: flex; align-items: center; justify-content: center; color: var(--text2); font-size: 13px; gap: 8px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* RESPONSIVE notice */
+  @media(max-width:900px) {
+    #sidebar { width: 56px; }
+    .logo-wrap .logo-text, .nav-item span, .nav-badge, .sidebar-footer .user-info { display: none; }
+    .nav-item { justify-content: center; padding: 12px; }
+    .nav-item .icon { width: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="logo-wrap">
+    <img src="imagenes/logo.png" alt="DiMOE" onerror="this.style.display='none'">
+    <div class="logo-text"><strong>DiMOE CRM</strong><span>Panel de gestión</span></div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Principal</div>
+    <div class="nav-item active" onclick="go('dashboard',this)"><span class="icon">📊</span><span>Dashboard</span></div>
+    <div class="nav-item" onclick="go('pedidos',this)"><span class="icon">🛍️</span><span>Pedidos</span><span class="nav-badge">7</span></div>
+    <div class="nav-item" onclick="go('reservas',this)"><span class="icon">📋</span><span>Reservas</span><span class="nav-badge green">12</span></div>
+    <div class="nav-item" onclick="go('agenda',this)"><span class="icon">📅</span><span>Agenda</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Negocio</div>
+    <div class="nav-item" onclick="go('club',this)"><span class="icon">⭐</span><span>Club DiMOE</span></div>
+    <div class="nav-item" onclick="go('pagos',this)"><span class="icon">💳</span><span>Pagos</span></div>
+    <div class="nav-item" onclick="go('menu',this)"><span class="icon">🍕</span><span>Menú & Stock</span></div>
+    <div class="nav-item" onclick="go('reportes',this)"><span class="icon">📈</span><span>Reportes</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Canales</div>
+    <div class="nav-item" onclick="go('whatsapp',this)"><span class="icon">💬</span><span>WhatsApp Bot</span><span class="nav-badge">3</span></div>
+    <div class="nav-item" onclick="go('delivery',this)"><span class="icon">🛵</span><span>Delivery</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Config</div>
+    <div class="nav-item" onclick="go('config',this)"><span class="icon">⚙️</span><span>Configuración</span></div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">JL</div>
+      <div class="user-info"><strong>Jose Luis</strong><span>Administrador</span></div>
+      <div class="status-dot"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Dashboard <span id="topbar-sub">Hoy, martes 17 de junio 2025</span></div>
+    <div class="topbar-actions">
+      <div class="live-badge"><div class="live-dot"></div>En vivo</div>
+      <div class="notif-btn tooltip" data-tip="3 notificaciones">🔔<div class="notif-dot"></div></div>
+      <button class="btn btn-primary" id="topbar-btn" onclick="topAction()">+ Nuevo pedido</button>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- ============ DASHBOARD ============ -->
+    <div id="sec-dashboard" class="section active">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon">💰</div>
+          <div class="kpi-label">Ventas hoy</div>
+          <div class="kpi-value" style="color:var(--accent)">$487.200</div>
+          <div class="kpi-meta"><span class="up">▲ 12%</span> vs. ayer</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">🛍️</div>
+          <div class="kpi-label">Pedidos activos</div>
+          <div class="kpi-value" style="color:var(--orange)">7</div>
+          <div class="kpi-meta">3 en cocina · 4 en delivery</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">👥</div>
+          <div class="kpi-label">Mesas ocupadas</div>
+          <div class="kpi-value" style="color:var(--blue)">8/14</div>
+          <div class="kpi-meta"><span class="up">57%</span> de ocupación</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">⭐</div>
+          <div class="kpi-label">Club DiMOE</div>
+          <div class="kpi-value" style="color:var(--green)">342</div>
+          <div class="kpi-meta"><span class="up">+8</span> nuevos esta semana</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- ventas semana -->
+        <div class="card">
+          <div class="card-title">Ventas últimos 7 días <span class="tag tag-yellow">CLP</span></div>
+          <div class="bar-chart">
+            <div class="bar-wrap"><div class="bar" style="height:55px" title="$310k"></div><div class="bar-label">L</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:80px;opacity:1" title="$460k"></div><div class="bar-label">M</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:45px" title="$260k"></div><div class="bar-label">X</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:95px" title="$540k"></div><div class="bar-label">J</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:100px" title="$580k"></div><div class="bar-label">V</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:90px;background:var(--green)" title="$520k"></div><div class="bar-label">S</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:68px;background:var(--accent)" title="$487k"></div><div class="bar-label">D</div></div>
+          </div>
+          <div style="margin-top:12px;font-size:12px;color:var(--text2)">Total semana: <strong style="color:var(--text)">$3.157.000</strong></div>
+        </div>
+
+        <!-- pedidos en tiempo real -->
+        <div class="card">
+          <div class="card-title">Pedidos en tiempo real <span class="tag tag-orange">7 activos</span></div>
+          <div class="order-item">
+            <div class="order-num">#042</div>
+            <div class="order-info"><strong>Pizza Margherita + Birra</strong><span>Mesa 5 · Juan C.</span></div>
+            <div>
+              <div class="pill pill-orange"><span class="pill-dot"></span>En cocina</div>
+              <div class="order-time">14:32</div>
+            </div>
+          </div>
+          <div class="order-item">
+            <div class="order-num">#041</div>
+            <div class="order-info"><strong>Pasta al Pesto x2 + Tiramisú</strong><span>Mesa 2 · Reserva García</span></div>
+            <div>
+              <div class="pill pill-blue"><span class="pill-dot"></span>Servido</div>
+              <div class="order-time">14:18</div>
+            </div>
+          </div>
+          <div class="order-item">
+            <div class="order-num">#040</div>
+            <div class="order-info"><strong>Delivery · Pizza Diavola + Ensalada</strong><span>Calle Balmaceda 841 · 🛵 En camino</span></div>
+            <div>
+              <div class="pill pill-green"><span class="pill-dot"></span>En camino</div>
+              <div class="order-time">14:05</div>
+            </div>
+          </div>
+          <div class="order-item">
+            <div class="order-num">#039</div>
+            <div class="order-info"><strong>Promo Duo + 2 bebidas</strong><span>Mesa 9 · Andrea M.</span></div>
+            <div>
+              <div class="pill pill-purple"><span class="pill-dot"></span>Pagando</div>
+              <div class="order-time">13:55</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="three-col">
+        <!-- Proximas reservas -->
+        <div class="card">
+          <div class="card-title">Próximas reservas <span class="tag tag-blue">Hoy</span></div>
+          <div class="reserva-row">
+            <div class="reserva-avatar">MR</div>
+            <div class="reserva-info"><strong>Martínez Rodríguez</strong><span>Mesa 6 · 4 personas</span></div>
+            <div class="reserva-meta"><strong>20:00</strong><span>2h</span></div>
+          </div>
+          <div class="reserva-row">
+            <div class="reserva-avatar">CF</div>
+            <div class="reserva-info"><strong>Cumpleaños Familia</strong><span>Salón · 10 personas</span></div>
+            <div class="reserva-meta"><strong>20:30</strong><span>2.5h</span></div>
+          </div>
+          <div class="reserva-row">
+            <div class="reserva-avatar">AP</div>
+            <div class="reserva-info"><strong>Andrea Pérez</strong><span>Mesa 3 · 2 personas</span></div>
+            <div class="reserva-meta"><strong>21:00</strong><span>1.5h</span></div>
+          </div>
+          <div class="reserva-row">
+            <div class="reserva-avatar">LV</div>
+            <div class="reserva-info"><strong>Luis Vargas + 5</strong><span>Mesa 11 · 6 personas</span></div>
+            <div class="reserva-meta"><strong>21:30</strong><span>2h</span></div>
+          </div>
+        </div>
+
+        <!-- Top platos -->
+        <div class="card">
+          <div class="card-title">Top platos hoy</div>
+          <div class="mini-stat">
+            <div><div class="mini-stat-label">🍕 Pizza Margherita</div><div class="progress-bar"><div class="progress-fill" style="width:85%"></div></div></div>
+            <div class="mini-stat-val" style="color:var(--accent)">17</div>
+          </div>
+          <div class="mini-stat">
+            <div><div class="mini-stat-label">🍕 Pizza Diavola</div><div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div></div>
+            <div class="mini-stat-val">14</div>
+          </div>
+          <div class="mini-stat">
+            <div><div class="mini-stat-label">🍝 Pasta Pesto</div><div class="progress-bar"><div class="progress-fill" style="width:55%;background:var(--blue)"></div></div></div>
+            <div class="mini-stat-val">11</div>
+          </div>
+          <div class="mini-stat">
+            <div><div class="mini-stat-label">🫕 Promo Duo</div><div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--green)"></div></div></div>
+            <div class="mini-stat-val">9</div>
+          </div>
+          <div class="mini-stat">
+            <div><div class="mini-stat-label">🍰 Tiramisú</div><div class="progress-bar"><div class="progress-fill" style="width:35%;background:var(--purple)"></div></div></div>
+            <div class="mini-stat-val">7</div>
+          </div>
+        </div>
+
+        <!-- Canales de venta -->
+        <div class="card">
+          <div class="card-title">Canales de venta</div>
+          <div class="mini-stat">
+            <div class="mini-stat-label">🪑 En local</div>
+            <div class="mini-stat-val">54%</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-label">🛵 Delivery propio</div>
+            <div class="mini-stat-val">28%</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-label">📱 Pedido online</div>
+            <div class="mini-stat-val">12%</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-label">💬 WhatsApp</div>
+            <div class="mini-stat-val">6%</div>
+          </div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+            <div style="font-size:12px;color:var(--text2);margin-bottom:4px">Ticket promedio hoy</div>
+            <div style="font-size:22px;font-weight:800;color:var(--accent)">$13.420</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PEDIDOS ============ -->
+    <div id="sec-pedidos" class="section">
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-icon">⏳</div><div class="kpi-label">Pendientes</div><div class="kpi-value" style="color:var(--orange)">3</div><div class="kpi-meta">Sin confirmar</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🍳</div><div class="kpi-label">En cocina</div><div class="kpi-value" style="color:var(--blue)">4</div><div class="kpi-meta">Promedio 18 min</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🛵</div><div class="kpi-label">En delivery</div><div class="kpi-value" style="color:var(--purple)">3</div><div class="kpi-meta">Radio 5 km</div></div>
+        <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-label">Completados hoy</div><div class="kpi-value" style="color:var(--green)">36</div><div class="kpi-meta"><span style="color:var(--green)">▲ 5</span> vs ayer</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Todos los pedidos de hoy <span class="tag tag-yellow">46 total</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Cliente</th><th>Items</th><th>Canal</th><th>Total</th><th>Estado</th><th>Hora</th><th>Acción</th></tr></thead>
+            <tbody>
+              <tr><td><strong style="color:var(--accent)">#042</strong></td><td>Juan Carrasco</td><td>Pizza Margherita + Birra</td><td>🪑 Local</td><td><strong>$14.500</strong></td><td><span class="pill pill-orange"><span class="pill-dot"></span>En cocina</span></td><td>14:32</td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Ver</button></td></tr>
+              <tr><td><strong style="color:var(--accent)">#041</strong></td><td>Fam. García</td><td>Pasta Pesto x2 + Tiramisú</td><td>🪑 Local</td><td><strong>$28.900</strong></td><td><span class="pill pill-blue"><span class="pill-dot"></span>Servido</span></td><td>14:18</td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Ver</button></td></tr>
+              <tr><td><strong style="color:var(--accent)">#040</strong></td><td>P. Soto</td><td>Pizza Diavola + Ensalada</td><td>🛵 Delivery</td><td><strong>$16.800</strong></td><td><span class="pill pill-green"><span class="pill-dot"></span>En camino</span></td><td>14:05</td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Rastrear</button></td></tr>
+              <tr><td><strong style="color:var(--accent)">#039</strong></td><td>Andrea M.</td><td>Promo Duo + 2 bebidas</td><td>🪑 Local</td><td><strong>$21.400</strong></td><td><span class="pill pill-purple"><span class="pill-dot"></span>Pagando</span></td><td>13:55</td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Cobrar</button></td></tr>
+              <tr><td><strong style="color:var(--accent)">#038</strong></td><td>Bot WhatsApp</td><td>Pizza Nonno + 2 Coca-Cola</td><td>💬 WhatsApp</td><td><strong>$18.200</strong></td><td><span class="pill pill-green"><span class="pill-dot"></span>Entregado</span></td><td>13:41</td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Ver</button></td></tr>
+              <tr><td><strong style="color:var(--accent)">#037</strong></td><td>C. Muñoz</td><td>Promo Familiar x1</td><td>📱 Online</td><td><strong>$24.900</strong></td><td><span class="pill pill-green"><span class="pill-dot"></span>Entregado</span></td><td>13:20</td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Ver</button></td></tr>
+              <tr><td><strong style="color:var(--accent)">#036</strong></td><td>Mario A.</td><td>Salmón + Agua + Tiramisú</td><td>🪑 Local</td><td><strong>$19.700</strong></td><td><span class="pill pill-gray"><span class="pill-dot"></span>Cancelado</span></td><td>12:58</td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Ver</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ RESERVAS ============ -->
+    <div id="sec-reservas" class="section">
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-icon">📋</div><div class="kpi-label">Reservas hoy</div><div class="kpi-value" style="color:var(--blue)">12</div><div class="kpi-meta">3 pendientes confirmar</div></div>
+        <div class="kpi-card"><div class="kpi-icon">👥</div><div class="kpi-label">Comensales</div><div class="kpi-value" style="color:var(--accent)">64</div><div class="kpi-meta">En 12 reservas</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🏠</div><div class="kpi-label">Mesas disponibles</div><div class="kpi-value" style="color:var(--green)">6</div><div class="kpi-meta">De 14 en total</div></div>
+        <div class="kpi-card"><div class="kpi-icon">⭐</div><div class="kpi-label">Club DiMOE</div><div class="kpi-value" style="color:var(--purple)">7</div><div class="kpi-meta">Reservas de miembros</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Reservas del día <span class="tag tag-blue">Martes 17 Jun</span></div>
+          <div class="reserva-row"><div class="reserva-avatar">LP</div><div class="reserva-info"><strong>Laura Pérez ⭐</strong><span>Mesa 4 · 2 personas · Cumpleaños</span></div><div class="reserva-meta"><strong>19:00</strong><span class="pill pill-green" style="font-size:10px">Confirmada</span></div></div>
+          <div class="reserva-row"><div class="reserva-avatar">DG</div><div class="reserva-info"><strong>Diego García</strong><span>Mesa 7 · 4 personas</span></div><div class="reserva-meta"><strong>19:30</strong><span class="pill pill-green" style="font-size:10px">Confirmada</span></div></div>
+          <div class="reserva-row"><div class="reserva-avatar">CM</div><div class="reserva-info"><strong>Claudia Morales</strong><span>Salón · 8 personas · Evento</span></div><div class="reserva-meta"><strong>20:00</strong><span class="pill pill-orange" style="font-size:10px">Pendiente</span></div></div>
+          <div class="reserva-row"><div class="reserva-avatar">MR</div><div class="reserva-info"><strong>Martínez Rodríguez ⭐</strong><span>Mesa 6 · 4 personas</span></div><div class="reserva-meta"><strong>20:00</strong><span class="pill pill-green" style="font-size:10px">Confirmada</span></div></div>
+          <div class="reserva-row"><div class="reserva-avatar">CF</div><div class="reserva-info"><strong>Cumpleaños Familia Silva</strong><span>Salón · 10 personas</span></div><div class="reserva-meta"><strong>20:30</strong><span class="pill pill-blue" style="font-size:10px">VIP</span></div></div>
+          <div class="reserva-row"><div class="reserva-avatar">AP</div><div class="reserva-info"><strong>Andrea Pérez</strong><span>Mesa 3 · 2 personas · WhatsApp</span></div><div class="reserva-meta"><strong>21:00</strong><span class="pill pill-green" style="font-size:10px">Confirmada</span></div></div>
+          <div class="reserva-row"><div class="reserva-avatar">LV</div><div class="reserva-info"><strong>Luis Vargas</strong><span>Mesa 11 · 6 personas</span></div><div class="reserva-meta"><strong>21:30</strong><span class="pill pill-orange" style="font-size:10px">Pendiente</span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Mapa de mesas <span class="tag tag-green">En vivo</span></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+            <div style="background:rgba(231,76,60,.15);border:1px solid var(--red);border-radius:8px;padding:10px;text-align:center;font-size:12px"><div style="font-weight:700;color:var(--red)">Mesa 1</div><div style="color:var(--text2);font-size:10px">Ocupada</div></div>
+            <div style="background:rgba(231,76,60,.15);border:1px solid var(--red);border-radius:8px;padding:10px;text-align:center;font-size:12px"><div style="font-weight:700;color:var(--red)">Mesa 2</div><div style="color:var(--text2);font-size:10px">Ocupada</div></div>
+            <div style="background:rgba(46,204,113,.1);border:1px solid var(--green);border-radius:8px;padding:10px;text-align:center;font-size:12px"><div style="font-weight:700;color:var(--green)">Mesa 3</div><div style="color:var(--text2);font-size:10px">Libre</div></div>
+            <div style="background:rgba(231,76,60,.15);border:1px solid var(--red);border-radius:8px;padding:10px;text-align:center;font-size:12px"><div style="font-weight:700;color:var(--red)">Mesa 4</div><div style="color:var(--text2);font-size:10px">Reservada</div></div>
+            <div style="background:rgba(231,76,60,.15);border:1px solid var(--red);border-radius:8px;padding:10px;text-align:center;font-size:12px"><div style="font-weight:700;color:var(--red)">Mesa 5</div><div style="color:var(--text2);font-size:10px">Ocupada</div></div>
+            <div style="background:rgba(232,184,75,.1);border:1px solid var(--accent);border-radius:8px;padding:10px;text-align:center;font-size:12px"><div style="font-weight:700;color:var(--accent)">Mesa 6</div><div style="color:var(--text2);font-size:10px">Reservada</div></div>
+            <div style="background:rgba(46,204,113,.1);border:1px solid var(--green);border-radius:8px;padding:10px;text-align:center;font-size:12px"><div style="font-weight:700;color:var(--green)">Mesa 7</div><div style="color:var(--text2);font-size:10px">Libre</div></div>
+            <div style="background:rgba(231,76,60,.15);border:1px solid var(--red);border-radius:8px;padding:10px;text-align:center;font-size:12px"><div style="font-weight:700;color:var(--red)">Mesa 8</div><div style="color:var(--text2);font-size:10px">Ocupada</div></div>
+            <div style="background:rgba(231,76,60,.15);border:1px solid var(--red);border-radius:8px;padding:10px;text-align:center;font-size:12px"><div style="font-weight:700;color:var(--red)">Mesa 9</div><div style="color:var(--text2);font-size:10px">Ocupada</div></div>
+            <div style="background:rgba(46,204,113,.1);border:1px solid var(--green);border-radius:8px;padding:10px;text-align:center;font-size:12px"><div style="font-weight:700;color:var(--green)">Mesa 10</div><div style="color:var(--text2);font-size:10px">Libre</div></div>
+            <div style="background:rgba(232,184,75,.1);border:1px solid var(--accent);border-radius:8px;padding:10px;text-align:center;font-size:12px"><div style="font-weight:700;color:var(--accent)">Mesa 11</div><div style="color:var(--text2);font-size:10px">Reservada</div></div>
+            <div style="background:rgba(46,204,113,.1);border:1px solid var(--green);border-radius:8px;padding:10px;text-align:center;font-size:12px"><div style="font-weight:700;color:var(--green)">Mesa 12</div><div style="color:var(--text2);font-size:10px">Libre</div></div>
+          </div>
+          <div style="display:flex;gap:12px;font-size:11px">
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block"></span>Ocupada</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--accent);display:inline-block"></span>Reservada</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--green);display:inline-block"></span>Libre</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ AGENDA ============ -->
+    <div id="sec-agenda" class="section">
+      <div class="card">
+        <div class="card-title">Agenda semanal — Semana 17-23 Jun 2025 <span class="tag tag-green">Esta semana</span></div>
+        <div class="agenda-grid">
+          <div class="ag-cell ag-header"></div>
+          <div class="ag-cell ag-header">LUN 17</div>
+          <div class="ag-cell ag-header">MAR 18</div>
+          <div class="ag-cell ag-header">MIÉ 19</div>
+          <div class="ag-cell ag-header">JUE 20</div>
+          <div class="ag-cell ag-header">VIE 21</div>
+          <div class="ag-cell ag-header" style="color:var(--accent)">SÁB 22</div>
+          <div class="ag-cell ag-header" style="color:var(--accent)">DOM 23</div>
+
+          <div class="ag-cell ag-hour">18:00</div>
+          <div class="ag-cell"><div class="ag-event">Apertura local</div></div>
+          <div class="ag-cell"><div class="ag-event">Apertura local</div></div>
+          <div class="ag-cell"><div class="ag-event">Apertura local</div></div>
+          <div class="ag-cell"><div class="ag-event">Apertura local</div></div>
+          <div class="ag-cell"><div class="ag-event">Apertura local</div></div>
+          <div class="ag-cell"><div class="ag-event">Apertura local</div></div>
+          <div class="ag-cell"><div class="ag-event">Apertura local</div></div>
+
+          <div class="ag-cell ag-hour">19:00</div>
+          <div class="ag-cell"><div class="ag-event green">Laura P. × 2</div></div>
+          <div class="ag-cell"></div>
+          <div class="ag-cell"><div class="ag-event">Corporativo × 8</div></div>
+          <div class="ag-cell"></div>
+          <div class="ag-cell"><div class="ag-event green">Aniversario × 2</div></div>
+          <div class="ag-cell"><div class="ag-event">Grupo × 6</div><div class="ag-event blue">Delivery rush</div></div>
+          <div class="ag-cell"><div class="ag-event">Almuerzo × 4</div></div>
+
+          <div class="ag-cell ag-hour">20:00</div>
+          <div class="ag-cell"><div class="ag-event">Martínez × 4</div><div class="ag-event red">Cumple Familia × 10</div></div>
+          <div class="ag-cell"><div class="ag-event">González × 3</div></div>
+          <div class="ag-cell"><div class="ag-event green">Club VIP × 5</div></div>
+          <div class="ag-cell"><div class="ag-event">Mesa privada × 6</div></div>
+          <div class="ag-cell"><div class="ag-event red">Cumple × 12</div><div class="ag-event">Pareja × 2</div></div>
+          <div class="ag-cell"><div class="ag-event red">Cumple × 8</div><div class="ag-event">Grupo × 5</div></div>
+          <div class="ag-cell"><div class="ag-event">Familia × 7</div></div>
+
+          <div class="ag-cell ag-hour">21:00</div>
+          <div class="ag-cell"><div class="ag-event blue">Andrea P. × 2</div><div class="ag-event">Luis V. × 6</div></div>
+          <div class="ag-cell"><div class="ag-event blue">Ramírez × 4</div></div>
+          <div class="ag-cell"><div class="ag-event">Torres × 3</div></div>
+          <div class="ag-cell"><div class="ag-event green">Pareja VIP × 2</div><div class="ag-event">Navarro × 5</div></div>
+          <div class="ag-cell"><div class="ag-event">Mesa 3 × 4</div><div class="ag-event blue">Entrega · 21:30</div></div>
+          <div class="ag-cell"><div class="ag-event">Grupo × 9</div></div>
+          <div class="ag-cell"><div class="ag-event blue">Cierre 22:00</div></div>
+
+          <div class="ag-cell ag-hour">22:00</div>
+          <div class="ag-cell"><div class="ag-event" style="opacity:.5">Cierre</div></div>
+          <div class="ag-cell"><div class="ag-event" style="opacity:.5">Cierre</div></div>
+          <div class="ag-cell"><div class="ag-event" style="opacity:.5">Cierre</div></div>
+          <div class="ag-cell"><div class="ag-event" style="opacity:.5">Cierre</div></div>
+          <div class="ag-cell"><div class="ag-event" style="opacity:.5">Cierre 23h</div></div>
+          <div class="ag-cell"><div class="ag-event red">Cierre 24:00</div></div>
+          <div class="ag-cell"><div class="ag-event" style="opacity:.5">Cierre</div></div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:16px;font-size:11px;color:var(--text2)">
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--accent);display:inline-block"></span>Reserva estándar</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--green);display:inline-block"></span>Club VIP</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--blue);display:inline-block"></span>Delivery / Evento especial</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block"></span>Celebración / Alta prioridad</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ CLUB DIMOE ============ -->
+    <div id="sec-club" class="section">
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-icon">👑</div><div class="kpi-label">Miembros Gold</div><div class="kpi-value" style="color:var(--accent)">48</div><div class="kpi-meta">+500 puntos acumulados</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🥈</div><div class="kpi-label">Miembros Silver</div><div class="kpi-value" style="color:#aaa">124</div><div class="kpi-meta">200–499 puntos</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🥉</div><div class="kpi-label">Miembros Bronze</div><div class="kpi-value" style="color:#cd7f32">170</div><div class="kpi-meta">1–199 puntos</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📲</div><div class="kpi-label">Tarjetas wallet</div><div class="kpi-value" style="color:var(--blue)">198</div><div class="kpi-meta">Apple + Google Wallet</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Top miembros <span class="tag tag-yellow">Por puntos</span></div>
+          <div class="club-member"><div class="tier-badge tier-gold">👑</div><div class="club-info"><strong>Andrea Suárez</strong><span>Miembro desde Mar 2024 · 28 visitas</span></div><div class="club-pts"><strong>1.840</strong><span>puntos</span></div></div>
+          <div class="club-member"><div class="tier-badge tier-gold">👑</div><div class="club-info"><strong>Roberto Cáceres</strong><span>Miembro desde Ene 2024 · 31 visitas</span></div><div class="club-pts"><strong>1.620</strong><span>puntos</span></div></div>
+          <div class="club-member"><div class="tier-badge tier-gold">👑</div><div class="club-info"><strong>Paola Venegas</strong><span>Miembro desde Feb 2024 · 24 visitas</span></div><div class="club-pts"><strong>1.410</strong><span>puntos</span></div></div>
+          <div class="club-member"><div class="tier-badge tier-silver">🥈</div><div class="club-info"><strong>Diego Leal</strong><span>Miembro desde Jun 2024 · 16 visitas</span></div><div class="club-pts"><strong>490</strong><span>puntos</span></div></div>
+          <div class="club-member"><div class="tier-badge tier-silver">🥈</div><div class="club-info"><strong>Valentina Rojas</strong><span>Miembro desde May 2024 · 14 visitas</span></div><div class="club-pts"><strong>380</strong><span>puntos</span></div></div>
+          <div class="club-member"><div class="tier-badge tier-bronze">🥉</div><div class="club-info"><strong>Camilo Fuentes</strong><span>Nuevo · 3 visitas</span></div><div class="club-pts"><strong>85</strong><span>puntos</span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Beneficios activos</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:4px solid var(--accent)">
+              <div style="font-weight:700;margin-bottom:4px">👑 Gold — Bebida gratis</div>
+              <div style="font-size:12px;color:var(--text2)">Una bebida gratis en cada visita. Activo para 48 miembros.</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:4px solid #aaa">
+              <div style="font-weight:700;margin-bottom:4px">🥈 Silver — 10% descuento</div>
+              <div style="font-size:12px;color:var(--text2)">10% de descuento en pedidos. 124 miembros activos.</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:4px solid #cd7f32">
+              <div style="font-weight:700;margin-bottom:4px">🥉 Bronze — 5% descuento</div>
+              <div style="font-size:12px;color:var(--text2)">5% de descuento al acumular 3+ visitas. 170 miembros.</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:4px solid var(--blue)">
+              <div style="font-weight:700;margin-bottom:4px">🎂 Cumpleaños — Postre gratis</div>
+              <div style="font-size:12px;color:var(--text2)">Postre de regalo en el mes de cumpleaños. 8 este mes.</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:12px;background:rgba(232,184,75,.07);border-radius:8px;border:1px solid rgba(232,184,75,.2)">
+            <div style="font-size:12px;color:var(--accent);font-weight:700;margin-bottom:4px">📲 Tarjeta Digital Wallet</div>
+            <div style="font-size:12px;color:var(--text2)">198 miembros con tarjeta Apple / Google Wallet activada. Los puntos se actualizan automáticamente.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PAGOS ============ -->
+    <div id="sec-pagos" class="section">
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-icon">💰</div><div class="kpi-label">Ingresos hoy</div><div class="kpi-value" style="color:var(--green)">$487.200</div><div class="kpi-meta"><span style="color:var(--green)">▲ 12%</span> vs ayer</div></div>
+        <div class="kpi-card"><div class="kpi-icon">💳</div><div class="kpi-label">Transacciones</div><div class="kpi-value" style="color:var(--blue)">36</div><div class="kpi-meta">Promedio $13.420</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📱</div><div class="kpi-label">Pago digital</div><div class="kpi-value" style="color:var(--purple)">72%</div><div class="kpi-meta">Webpay · Transfer · QR</div></div>
+        <div class="kpi-card"><div class="kpi-icon">↩️</div><div class="kpi-label">Devoluciones</div><div class="kpi-value" style="color:var(--red)">1</div><div class="kpi-meta">$8.500 reembolsado</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Últimas transacciones</div>
+          <div class="pago-row"><div class="pago-icon">💳</div><div class="pago-info"><strong>Webpay — Mesa 5</strong><span>Juan Carrasco · #042</span></div><div class="pago-amount income">+$14.500</div></div>
+          <div class="pago-row"><div class="pago-icon">📲</div><div class="pago-info"><strong>Transferencia — Mesa 2</strong><span>Fam. García · #041</span></div><div class="pago-amount income">+$28.900</div></div>
+          <div class="pago-row"><div class="pago-icon">💳</div><div class="pago-info"><strong>Webpay — Delivery</strong><span>P. Soto · #040</span></div><div class="pago-amount income">+$16.800</div></div>
+          <div class="pago-row"><div class="pago-icon">💵</div><div class="pago-info"><strong>Efectivo — Mesa 9</strong><span>Andrea M. · #039</span></div><div class="pago-amount income">+$21.400</div></div>
+          <div class="pago-row"><div class="pago-icon">📲</div><div class="pago-info"><strong>QR — Delivery</strong><span>Bot WhatsApp · #038</span></div><div class="pago-amount income">+$18.200</div></div>
+          <div class="pago-row"><div class="pago-icon">↩️</div><div class="pago-info"><strong>Devolución — Mesa 7</strong><span>Mario A. · #036 · Cancelado</span></div><div class="pago-amount refund">−$8.500</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Métodos de pago hoy</div>
+          <div class="mini-stat">
+            <div><div class="mini-stat-label">💳 Webpay / Débito</div><div class="progress-bar"><div class="progress-fill" style="width:48%"></div></div></div>
+            <div class="mini-stat-val">48%</div>
+          </div>
+          <div class="mini-stat">
+            <div><div class="mini-stat-label">💵 Efectivo</div><div class="progress-bar"><div class="progress-fill" style="width:28%;background:var(--green)"></div></div></div>
+            <div class="mini-stat-val">28%</div>
+          </div>
+          <div class="mini-stat">
+            <div><div class="mini-stat-label">📲 Transferencia</div><div class="progress-bar"><div class="progress-fill" style="width:15%;background:var(--blue)"></div></div></div>
+            <div class="mini-stat-val">15%</div>
+          </div>
+          <div class="mini-stat">
+            <div><div class="mini-stat-label">🔳 Código QR</div><div class="progress-bar"><div class="progress-fill" style="width:9%;background:var(--purple)"></div></div></div>
+            <div class="mini-stat-val">9%</div>
+          </div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--text2)">Subtotal bruto</span><strong>$495.700</strong></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:var(--text2)">Devoluciones</span><strong style="color:var(--red)">−$8.500</strong></div>
+            <div style="display:flex;justify-content:space-between;font-size:16px"><span style="color:var(--text2)">Total neto</span><strong style="color:var(--green)">$487.200</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ MENÚ & STOCK ============ -->
+    <div id="sec-menu" class="section">
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-title">Menú activo & disponibilidad <span class="tag tag-orange">3 items bajos</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Plato</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Vendidos hoy</th><th>Estado</th><th>Acción</th></tr></thead>
+            <tbody>
+              <tr><td><strong>🍕 Pizza Margherita</strong></td><td>Pizzas</td><td>$10.900</td><td><span style="color:var(--green)">✓ OK</span></td><td>17</td><td><span class="pill pill-green">Disponible</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Editar</button></td></tr>
+              <tr><td><strong>🍕 Pizza Diavola</strong></td><td>Pizzas</td><td>$11.900</td><td><span style="color:var(--green)">✓ OK</span></td><td>14</td><td><span class="pill pill-green">Disponible</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Editar</button></td></tr>
+              <tr><td><strong>🍝 Pasta al Pesto</strong></td><td>Pastas</td><td>$10.900</td><td><span style="color:var(--orange)">⚠ Bajo</span></td><td>11</td><td><span class="pill pill-orange">Stock bajo</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Editar</button></td></tr>
+              <tr><td><strong>🐟 Salmón al Limón</strong></td><td>Especialidades</td><td>$13.900</td><td><span style="color:var(--red)">✗ Agotado</span></td><td>4</td><td><span class="pill pill-red">Agotado</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Activar</button></td></tr>
+              <tr><td><strong>🫕 Promo Duo</strong></td><td>Promos</td><td>$18.900</td><td><span style="color:var(--green)">✓ OK</span></td><td>9</td><td><span class="pill pill-green">Disponible</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Editar</button></td></tr>
+              <tr><td><strong>🍰 Tiramisú</strong></td><td>Postres</td><td>$4.900</td><td><span style="color:var(--orange)">⚠ Bajo</span></td><td>7</td><td><span class="pill pill-orange">Stock bajo</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Editar</button></td></tr>
+              <tr><td><strong>🍕 Pizza Nonno</strong></td><td>Pizzas</td><td>$11.900</td><td><span style="color:var(--green)">✓ OK</span></td><td>6</td><td><span class="pill pill-green">Disponible</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Editar</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ REPORTES ============ -->
+    <div id="sec-reportes" class="section">
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-icon">📅</div><div class="kpi-label">Ventas mes actual</div><div class="kpi-value" style="color:var(--accent)">$8.240.000</div><div class="kpi-meta"><span style="color:var(--green)">▲ 18%</span> vs. mes anterior</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📊</div><div class="kpi-label">Promedio diario</div><div class="kpi-value" style="color:var(--blue)">$412.000</div><div class="kpi-meta">17 días del mes</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🛍️</div><div class="kpi-label">Total pedidos mes</div><div class="kpi-value" style="color:var(--green)">614</div><div class="kpi-meta">Ticket prom. $13.420</div></div>
+        <div class="kpi-card"><div class="kpi-icon">⭐</div><div class="kpi-label">Rating Google</div><div class="kpi-value" style="color:var(--orange)">4.7</div><div class="kpi-meta">⭐⭐⭐⭐⭐ 312 reseñas</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Ventas por mes 2025</div>
+          <div class="bar-chart" style="height:120px">
+            <div class="bar-wrap"><div class="bar" style="height:70px"></div><div class="bar-label">Ene</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:80px"></div><div class="bar-label">Feb</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:65px"></div><div class="bar-label">Mar</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:90px"></div><div class="bar-label">Abr</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:85px"></div><div class="bar-label">May</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:120px;background:var(--green);opacity:1"></div><div class="bar-label" style="color:var(--green)">Jun</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Resumen mensual</div>
+          <div class="mini-stat"><div class="mini-stat-label">Ventas en local</div><div class="mini-stat-val">$4.449.600</div></div>
+          <div class="mini-stat"><div class="mini-stat-label">Delivery propio</div><div class="mini-stat-val">$2.307.200</div></div>
+          <div class="mini-stat"><div class="mini-stat-label">Pedidos online</div><div class="mini-stat-val">$988.800</div></div>
+          <div class="mini-stat"><div class="mini-stat-label">WhatsApp bot</div><div class="mini-stat-val">$494.400</div></div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
+            <span style="color:var(--text2)">Total mes (17 días)</span>
+            <strong style="color:var(--accent);font-size:16px">$8.240.000</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ WHATSAPP BOT ============ -->
+    <div id="sec-whatsapp" class="section">
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-icon">💬</div><div class="kpi-label">Conversaciones hoy</div><div class="kpi-value" style="color:var(--green)">28</div><div class="kpi-meta">Valentina Bot activa</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🤖</div><div class="kpi-label">Resueltas por bot</div><div class="kpi-value" style="color:var(--blue)">22</div><div class="kpi-meta">78% automatizadas</div></div>
+        <div class="kpi-card"><div class="kpi-icon">👨‍💼</div><div class="kpi-label">Escaladas a humano</div><div class="kpi-value" style="color:var(--orange)">6</div><div class="kpi-meta">3 pendientes ahora</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🛍️</div><div class="kpi-label">Pedidos via WA</div><div class="kpi-value" style="color:var(--accent)">4</div><div class="kpi-meta">$62.400 en ventas</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Conversaciones activas <span class="tag tag-orange">3 pendientes</span></div>
+          <div class="club-member"><div class="tier-badge tier-gold" style="font-size:20px">💬</div><div class="club-info"><strong>+56 9 8812 3456 · Valentina R.</strong><span>¿Tienen mesa para 4 personas esta noche?</span></div><div style="text-align:right"><span class="pill pill-orange" style="font-size:10px">Pendiente</span><div style="font-size:10px;color:var(--text2);margin-top:4px">14:28</div></div></div>
+          <div class="club-member"><div class="tier-badge" style="font-size:20px;background:rgba(46,204,113,.1)">💬</div><div class="club-info"><strong>+56 9 7234 5678 · Carlos M.</strong><span>Quiero pedir delivery, ¿hacen a Los Boldos?</span></div><div style="text-align:right"><span class="pill pill-orange" style="font-size:10px">Pendiente</span><div style="font-size:10px;color:var(--text2);margin-top:4px">14:11</div></div></div>
+          <div class="club-member"><div class="tier-badge" style="font-size:20px;background:rgba(139,92,246,.1)">🤖</div><div class="club-info"><strong>+56 9 6543 2109 · Bot resolvió</strong><span>Reserva confirmada para 2 personas 20:00</span></div><div style="text-align:right"><span class="pill pill-green" style="font-size:10px">Resuelto</span><div style="font-size:10px;color:var(--text2);margin-top:4px">13:58</div></div></div>
+          <div class="club-member"><div class="tier-badge" style="font-size:20px;background:rgba(139,92,246,.1)">🤖</div><div class="club-info"><strong>+56 9 9988 1122 · Bot resolvió</strong><span>Horario y dirección enviados automáticamente</span></div><div style="text-align:right"><span class="pill pill-green" style="font-size:10px">Resuelto</span><div style="font-size:10px;color:var(--text2);margin-top:4px">13:42</div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Top consultas del bot</div>
+          <div class="mini-stat"><div class="mini-stat-label">📋 Reservas</div><div class="mini-stat-val" style="color:var(--accent)">32%</div></div>
+          <div class="mini-stat"><div class="mini-stat-label">🕐 Horarios</div><div class="mini-stat-val">24%</div></div>
+          <div class="mini-stat"><div class="mini-stat-label">🛵 Delivery</div><div class="mini-stat-val">19%</div></div>
+          <div class="mini-stat"><div class="mini-stat-label">🍕 Menú</div><div class="mini-stat-val">15%</div></div>
+          <div class="mini-stat"><div class="mini-stat-label">📍 Ubicación</div><div class="mini-stat-val">10%</div></div>
+          <div style="margin-top:14px;padding:12px;background:rgba(46,204,113,.07);border-radius:8px;border:1px solid rgba(46,204,113,.2)">
+            <div style="font-size:12px;color:var(--green);font-weight:700;margin-bottom:4px">🤖 Valentina — Bot activa 24/7</div>
+            <div style="font-size:12px;color:var(--text2)">Responde horarios, reservas, ubicación, menú y pedidos automáticamente. Tiempo promedio de respuesta: <strong style="color:var(--text)">3 segundos</strong>.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ DELIVERY ============ -->
+    <div id="sec-delivery" class="section">
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-icon">🛵</div><div class="kpi-label">En camino ahora</div><div class="kpi-value" style="color:var(--orange)">3</div><div class="kpi-meta">Radio máx. 5 km</div></div>
+        <div class="kpi-card"><div class="kpi-icon">⏱️</div><div class="kpi-label">Tiempo promedio</div><div class="kpi-value" style="color:var(--blue)">28 min</div><div class="kpi-meta">Desde confirmación</div></div>
+        <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-label">Entregas hoy</div><div class="kpi-value" style="color:var(--green)">12</div><div class="kpi-meta">100% satisfacción</div></div>
+        <div class="kpi-card"><div class="kpi-icon">💰</div><div class="kpi-label">Ingresos delivery</div><div class="kpi-value" style="color:var(--accent)">$136.400</div><div class="kpi-meta">28% del total</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Pedidos delivery en curso</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Cliente</th><th>Pedido</th><th>Dirección</th><th>Repartidor</th><th>Estado</th><th>ETA</th></tr></thead>
+            <tbody>
+              <tr><td><strong style="color:var(--accent)">#040</strong></td><td>P. Soto</td><td>Pizza Diavola + Ensalada</td><td>Balmaceda 841</td><td>🛵 Carlos R.</td><td><span class="pill pill-green"><span class="pill-dot"></span>En camino</span></td><td><strong style="color:var(--green)">~8 min</strong></td></tr>
+              <tr><td><strong style="color:var(--accent)">#035</strong></td><td>M. Contreras</td><td>Promo Familiar</td><td>Los Boldos 234</td><td>🛵 Luis M.</td><td><span class="pill pill-orange"><span class="pill-dot"></span>Preparando</span></td><td><strong style="color:var(--orange)">~22 min</strong></td></tr>
+              <tr><td><strong style="color:var(--accent)">#033</strong></td><td>Bot WA</td><td>Pizza Nonno + Bebidas</td><td>Arturo Prat 512</td><td>🛵 Asignando</td><td><span class="pill pill-blue"><span class="pill-dot"></span>Confirmado</span></td><td><strong style="color:var(--blue)">~35 min</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="map-placeholder" style="margin-top:16px">🗺️ Mapa en tiempo real de repartidores (Google Maps API)</div>
+      </div>
+    </div>
+
+    <!-- ============ CONFIG ============ -->
+    <div id="sec-config" class="section">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Información del restaurante</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div><div style="font-size:11px;color:var(--text2);margin-bottom:4px">Nombre</div><div style="background:var(--bg3);border-radius:7px;padding:9px 12px;font-size:13px">DiMOE Pizzería y Restobar</div></div>
+            <div><div style="font-size:11px;color:var(--text2);margin-bottom:4px">Dirección</div><div style="background:var(--bg3);border-radius:7px;padding:9px 12px;font-size:13px">Camino El Monte 1440, Paine, Chile</div></div>
+            <div><div style="font-size:11px;color:var(--text2);margin-bottom:4px">Horario de atención</div><div style="background:var(--bg3);border-radius:7px;padding:9px 12px;font-size:13px">Mar–Jue 13:00–22:00 · Vie–Dom 13:00–23:30</div></div>
+            <div><div style="font-size:11px;color:var(--text2);margin-bottom:4px">WhatsApp</div><div style="background:var(--bg3);border-radius:7px;padding:9px 12px;font-size:13px">+56 9 7369 4101</div></div>
+            <div><div style="font-size:11px;color:var(--text2);margin-bottom:4px">Instagram</div><div style="background:var(--bg3);border-radius:7px;padding:9px 12px;font-size:13px">@dimoe_restobar</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Módulos del Plan Premium</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600">📱 Sitio web + SEO</div><div style="font-size:11px;color:var(--text2)">Web profesional con dominio propio</div></div><span class="pill pill-green">Activo</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600">🛍️ Pedidos online</div><div style="font-size:11px;color:var(--text2)">Carrito + pago Webpay/Transferencia</div></div><span class="pill pill-green">Activo</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600">📋 Reservas inteligentes</div><div style="font-size:11px;color:var(--text2)">Online + confirmación WhatsApp</div></div><span class="pill pill-green">Activo</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600">⭐ Club DiMOE + Wallet</div><div style="font-size:11px;color:var(--text2)">Apple / Google Wallet digital</div></div><span class="pill pill-green">Activo</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600">🤖 WhatsApp Bot 24/7</div><div style="font-size:11px;color:var(--text2)">Valentina — respuestas automáticas</div></div><span class="pill pill-green">Activo</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0"><div><div style="font-size:13px;font-weight:600">📊 CRM + Reportes</div><div style="font-size:11px;color:var(--text2)">Dashboard, pedidos, pagos, analytics</div></div><span class="pill pill-green">Activo</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+const titles = {
+  dashboard: ['Dashboard', 'Hoy, martes 17 de junio 2025'],
+  pedidos: ['Pedidos', '46 pedidos hoy'],
+  reservas: ['Reservas', '12 reservas activas'],
+  agenda: ['Agenda', 'Semana 17–23 Jun 2025'],
+  club: ['Club DiMOE', '342 miembros activos'],
+  pagos: ['Pagos & Facturación', 'Hoy · $487.200'],
+  menu: ['Menú & Stock', '3 items con alerta'],
+  reportes: ['Reportes', 'Junio 2025'],
+  whatsapp: ['WhatsApp Bot', '28 conversaciones hoy'],
+  delivery: ['Delivery', '3 pedidos en curso'],
+  config: ['Configuración', 'Plan Premium']
+};
+const btns = {
+  dashboard: '+ Nuevo pedido',
+  pedidos: '+ Nuevo pedido',
+  reservas: '+ Nueva reserva',
+  agenda: '+ Agregar evento',
+  club: '+ Nuevo miembro',
+  pagos: 'Exportar reporte',
+  menu: '+ Agregar plato',
+  reportes: 'Exportar PDF',
+  whatsapp: 'Ver todas',
+  delivery: '+ Nuevo delivery',
+  config: 'Guardar cambios'
+};
+
+function go(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('topbar-title').innerHTML = titles[id][0] + ' <span id="topbar-sub">' + titles[id][1] + '</span>';
+  document.getElementById('topbar-btn').textContent = btns[id] || '+ Nuevo';
+}
+
+function topAction() {
+  const active = document.querySelector('.nav-item.active span:last-of-type')?.textContent || '';
+  alert('Esta acción abrirá el formulario correspondiente en la versión final del sistema.');
+}
+
+// Simulated live counter
+setInterval(() => {
+  const el = document.querySelector('#sec-dashboard .kpi-value');
+  if (el) {
+    const base = 487200;
+    const rand = Math.floor(Math.random() * 500) * (Math.random() > 0.3 ? 1 : 0);
+    el.textContent = '$' + (base + rand).toLocaleString('es-CL');
+  }
+}, 8000);
+</script>
+</body>
+</html>
