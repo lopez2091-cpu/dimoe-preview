@@ -7,9 +7,8 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&display=swap');
 :root{--gold:#c8922a;--gold-l:#e8b84b;--cream:#f5f0e8;--dark:#0e0c09;--dark2:#181410;--dark3:#221d14;--muted:#8a7f6a;--border:rgba(200,146,42,0.2);}
-*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
-body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--cream);overflow-x:hidden;cursor:none;}
-body.loaded{cursor:none;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;overflow-x:hidden;}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--cream);overflow-x:hidden;}
 
 /* ── SPLASH ── */
 #splash{position:fixed;inset:0;z-index:9999;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;pointer-events:all;}
@@ -28,13 +27,6 @@ body.loaded{cursor:none;}
 .splash-curtain.open .sc-top{transform:translateY(-100%);}
 .splash-curtain.open .sc-bot{transform:translateY(100%);}
 
-/* ── CURSOR ── */
-#cursor{position:fixed;width:40px;height:40px;border:1.5px solid var(--gold);border-radius:50%;pointer-events:none;z-index:9990;transform:translate(-50%,-50%);transition:width .22s,height .22s,background .22s,border-color .22s,opacity .3s;mix-blend-mode:normal;opacity:0;}
-#cursor-dot{position:fixed;width:5px;height:5px;background:var(--gold-l);border-radius:50%;pointer-events:none;z-index:9991;transform:translate(-50%,-50%);opacity:0;transition:opacity .3s;}
-body.loaded #cursor,body.loaded #cursor-dot{opacity:1;}
-#cursor.hover{width:60px;height:60px;background:rgba(200,146,42,.08);border-color:var(--gold-l);}
-#cursor.click{width:28px;height:28px;background:rgba(200,146,42,.15);}
-@media(hover:none),(pointer:coarse){#cursor,#cursor-dot{display:none;}body{cursor:auto;}}
 
 /* ── SCROLL PROGRESS ── */
 #sprogress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-l));z-index:9997;width:0%;pointer-events:none;transition:width .08s linear;}
@@ -533,14 +525,43 @@ footer{background:#060504;padding:64px 48px 40px;}
   .lbl{font-size:9px;}
   .dsc{font-size:13px;}
   .tags{margin-top:18px;}
+
+  /* SIDE LABELS — ocultar en móvil para evitar overflow */
+  .side-label{display:none;}
+
+  /* MANIFESTO */
+  .mq{font-size:clamp(22px,7vw,36px);}
+}
+
+@media(max-width:480px){
+  /* FOOTER — una columna en pantallas muy pequeñas */
+  .footer-grid{grid-template-columns:1fr;gap:28px;}
+  .fg-brand{grid-column:span 1;}
+
+  /* HERO — ajustes extra pequeños */
+  .hero h1{font-size:clamp(38px,13vw,56px);}
+  .hbtns{gap:8px;}
+  .btn-g,.btn-o{padding:13px 18px;font-size:12px;}
+
+  /* NÚMEROS — una columna */
+  .nums{grid-template-columns:1fr 1fr;}
+  .ni:nth-child(odd){border-right:1px solid var(--border);}
+
+  /* CLUB */
+  .journey{grid-template-columns:1fr;}
+  .how-steps{grid-template-columns:1fr;}
+
+  /* INSTAGRAM */
+  .ig-grid{grid-template-columns:1fr 1fr;}
+
+  /* MISCELÁNEA */
+  .manifesto{padding:52px 16px;}
+  .mq{font-size:clamp(20px,8vw,30px);}
 }
 </style>
 </head>
 <body>
 
-<!-- CURSOR -->
-<div id="cursor"></div>
-<div id="cursor-dot"></div>
 
 <!-- SCROLL PROGRESS -->
 <div id="sprogress"></div>
@@ -1179,36 +1200,6 @@ function toggleChat() {
   }, 2200);
 })();
 
-// ══════════════════════════════════════
-// CUSTOM CURSOR
-// ══════════════════════════════════════
-(function() {
-  const cur = document.getElementById('cursor');
-  const dot = document.getElementById('cursor-dot');
-  let mx = 0, my = 0, cx = 0, cy = 0;
-
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    dot.style.left = mx + 'px';
-    dot.style.top  = my + 'px';
-  });
-
-  (function lerp() {
-    cx += (mx - cx) * 0.1;
-    cy += (my - cy) * 0.1;
-    cur.style.left = cx + 'px';
-    cur.style.top  = cy + 'px';
-    requestAnimationFrame(lerp);
-  })();
-
-  document.addEventListener('mousedown', () => cur.classList.add('click'));
-  document.addEventListener('mouseup',   () => cur.classList.remove('click'));
-
-  document.querySelectorAll('a,button,.mcard,.ec,.ig-item,.jbadge,.mtab,.cat-btn').forEach(el => {
-    el.addEventListener('mouseenter', () => cur.classList.add('hover'));
-    el.addEventListener('mouseleave', () => cur.classList.remove('hover'));
-  });
-})();
 
 // ══════════════════════════════════════
 // SCROLL PROGRESS BAR
