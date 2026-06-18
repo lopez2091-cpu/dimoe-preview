@@ -386,6 +386,38 @@ nav.scrolled{padding:12px 48px;background:rgba(14,12,9,.97);backdrop-filter:blur
 /* PREVIEW BADGE */
 .pvbadge{position:fixed;top:70px;right:0;z-index:300;background:rgba(200,146,42,.95);color:var(--dark);padding:7px 16px 7px 18px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-radius:4px 0 0 4px;}
 
+/* GALERÍA — NUESTRA GENTE */
+.galeria{padding:100px 0;background:var(--dark);overflow:hidden;}
+.galeria-head{text-align:center;padding:0 24px;margin-bottom:56px;}
+.galeria-head .lbl{margin-bottom:10px;}
+.galeria-head .ttl{max-width:560px;margin:0 auto;}
+.galeria-head .dsc{max-width:480px;margin:14px auto 0;}
+.gal-track-wrap{position:relative;}
+.gal-track{display:flex;gap:20px;padding:0 40px;transition:transform .5s cubic-bezier(.4,0,.2,1);}
+.gal-slide{flex:0 0 calc(33.333% - 14px);border-radius:16px;overflow:hidden;position:relative;aspect-ratio:4/5;background:var(--dark3);cursor:pointer;}
+.gal-slide img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease;}
+.gal-slide:hover img{transform:scale(1.06);}
+.gal-slide-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(14,12,9,.85) 0%,transparent 50%);opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:24px;}
+.gal-slide:hover .gal-slide-ov{opacity:1;}
+.gal-slide-cap{color:var(--cream);font-size:13px;font-weight:600;line-height:1.4;}
+.gal-slide-cap span{display:block;color:var(--muted);font-size:11px;font-weight:400;margin-top:3px;}
+.gal-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;height:100%;background:var(--dark3);border:1px dashed rgba(200,146,42,.25);}
+.gal-placeholder-icon{font-size:36px;opacity:.4;}
+.gal-placeholder-txt{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:center;padding:0 20px;}
+.gal-arrows{display:flex;gap:12px;justify-content:center;margin-top:36px;}
+.gal-arr{width:48px;height:48px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--cream);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.gal-arr:hover{background:var(--gold);border-color:var(--gold);color:var(--dark);}
+.gal-arr:disabled{opacity:.25;cursor:default;}
+.gal-dots{display:flex;gap:8px;justify-content:center;margin-top:20px;}
+.gal-dot{width:6px;height:6px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .2s;}
+.gal-dot.on{width:20px;border-radius:3px;background:var(--gold);}
+@media(max-width:768px){
+  .galeria{padding:60px 0;}
+  .gal-track{padding:0 20px;gap:14px;}
+  .gal-slide{flex:0 0 75vw;}
+  .galeria-head{margin-bottom:36px;}
+}
+
 /* MANIFESTO */
 .manifesto{padding:120px 48px;text-align:center;position:relative;overflow:hidden;background:var(--dark2);}
 .manifesto::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(200,146,42,.06),transparent 70%);pointer-events:none;}
@@ -974,6 +1006,64 @@ footer{background:#060504;padding:64px 48px 40px;}
   </div>
 </div>
 
+<!-- GALERÍA NUESTRA GENTE -->
+<div class="galeria reveal">
+  <div class="galeria-head">
+    <div class="lbl">Nuestra Gente</div>
+    <h2 class="ttl">Detrás de cada <em>pizza</em>,<br>hay un equipo con alma</h2>
+    <p class="dsc">Somos familia, vecinos, apasionados. Conoce a las personas que hacen posible la experiencia DiMOE cada día.</p>
+  </div>
+  <div class="gal-track-wrap">
+    <div class="gal-track" id="galTrack">
+      <div class="gal-slide">
+        <img src="imagenes/local.jpg" alt="DiMOE local">
+        <div class="gal-slide-ov"><div class="gal-slide-cap">El local<span>Paine, Región Metropolitana</span></div></div>
+      </div>
+      <div class="gal-slide">
+        <div class="gal-placeholder">
+          <div class="gal-placeholder-icon">📸</div>
+          <div class="gal-placeholder-txt">Foto del equipo<br>próximamente</div>
+        </div>
+      </div>
+      <div class="gal-slide">
+        <img src="imagenes/hero.jpg" alt="Pizza DiMOE">
+        <div class="gal-slide-ov"><div class="gal-slide-cap">La pizza napolitana<span>Masa fermentada 48 horas</span></div></div>
+      </div>
+      <div class="gal-slide">
+        <div class="gal-placeholder">
+          <div class="gal-placeholder-icon">🏆</div>
+          <div class="gal-placeholder-txt">2do lugar<br>The Top Pizza RM</div>
+        </div>
+      </div>
+      <div class="gal-slide">
+        <img src="imagenes/mort.jpg" alt="Mortadella e Pistacchio">
+        <div class="gal-slide-ov"><div class="gal-slide-cap">Mortadella e Pistacchio<span>Pizza firma DiMOE</span></div></div>
+      </div>
+      <div class="gal-slide">
+        <div class="gal-placeholder">
+          <div class="gal-placeholder-icon">🎶</div>
+          <div class="gal-placeholder-txt">Música en vivo<br>todos los fines de semana</div>
+        </div>
+      </div>
+      <div class="gal-slide">
+        <img src="imagenes/nonno.jpg" alt="Pizza DiMOE">
+        <div class="gal-slide-ov"><div class="gal-slide-cap">El Nonno<span>Receta de la casa</span></div></div>
+      </div>
+      <div class="gal-slide">
+        <div class="gal-placeholder">
+          <div class="gal-placeholder-icon">🐾</div>
+          <div class="gal-placeholder-txt">Pet friendly<br>trae a tu mascota</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="gal-arrows">
+    <button class="gal-arr" id="galPrev" onclick="galMove(-1)">←</button>
+    <button class="gal-arr" id="galNext" onclick="galMove(1)">→</button>
+  </div>
+  <div class="gal-dots" id="galDots"></div>
+</div>
+
 <!-- INSTAGRAM -->
 <div class="igsec">
   <div class="igin">
@@ -1208,6 +1298,57 @@ function toggleChat() {
 
 
 // ══════════════════════════════════════
+// ══════════════════════════════════════
+// GALERÍA NUESTRA GENTE
+// ══════════════════════════════════════
+(function() {
+  const track = document.getElementById('galTrack');
+  const dotsEl = document.getElementById('galDots');
+  if (!track) return;
+  const slides = track.querySelectorAll('.gal-slide');
+  let current = 0;
+
+  const visibleCount = () => window.innerWidth <= 768 ? 1 : 3;
+
+  function totalPages() {
+    return Math.max(1, slides.length - visibleCount() + 1);
+  }
+
+  function buildDots() {
+    dotsEl.innerHTML = '';
+    for (let i = 0; i < totalPages(); i++) {
+      const d = document.createElement('button');
+      d.className = 'gal-dot' + (i === current ? ' on' : '');
+      d.setAttribute('aria-label', 'Ir a foto ' + (i+1));
+      d.onclick = () => goTo(i);
+      dotsEl.appendChild(d);
+    }
+  }
+
+  function goTo(idx) {
+    current = Math.max(0, Math.min(idx, totalPages() - 1));
+    const slideW = slides[0].getBoundingClientRect().width + 20;
+    track.style.transform = 'translateX(-' + (current * slideW) + 'px)';
+    document.getElementById('galPrev').disabled = current === 0;
+    document.getElementById('galNext').disabled = current >= totalPages() - 1;
+    dotsEl.querySelectorAll('.gal-dot').forEach((d, i) => d.classList.toggle('on', i === current));
+  }
+
+  window.galMove = function(dir) { goTo(current + dir); };
+
+  buildDots();
+  goTo(0);
+  window.addEventListener('resize', () => { buildDots(); goTo(Math.min(current, totalPages()-1)); });
+
+  // swipe táctil
+  let tsx = 0;
+  track.addEventListener('touchstart', e => tsx = e.touches[0].clientX, {passive:true});
+  track.addEventListener('touchend', e => {
+    const dx = tsx - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 40) galMove(dx > 0 ? 1 : -1);
+  }, {passive:true});
+})();
+
 // SCROLL PROGRESS BAR
 // ══════════════════════════════════════
 (function() {
