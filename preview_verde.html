@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiMOE · Vista Previa Paleta Verde</title>
+<style>
+/* ===== PALETA ACTUAL vs NUEVA ===== */
+:root {
+  /* NUEVA paleta verde DiMOE */
+  --green-dark:   #0d1a08;
+  --green-bg:     #111f0b;
+  --green-card:   #172810;
+  --green-mid:    #1f3516;
+  --green-olive:  #3d5922;
+  --green-light:  #5c7a38;
+  --green-muted:  #8aaa60;
+
+  --grad-start:   #e84b8a;
+  --grad-mid:     #e8804b;
+  --grad-end:     #e8c84b;
+  --gold:         #c8a045;
+  --white:        #f5f2ec;
+  --muted:        #8a9e78;
+  --border:       rgba(92,122,56,.22);
+  --border2:      rgba(200,160,69,.18);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--green-dark); color: var(--white); max-width: 480px; margin: 0 auto; }
+
+/* LABEL BANNER */
+.preview-label {
+  background: linear-gradient(90deg, var(--grad-start), var(--grad-mid), var(--grad-end));
+  color: #1a1000; font-size: 11px; font-weight: 800; text-align: center;
+  padding: 8px; letter-spacing: .1em; text-transform: uppercase; position: sticky; top: 0; z-index: 200;
+}
+
+/* ===== NAV ===== */
+nav {
+  background: rgba(13,26,8,.96); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 32px; z-index: 100;
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; }
+.nav-logo-circle {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-mid), var(--grad-end));
+  padding: 2px; flex-shrink: 0;
+}
+.nav-logo-circle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.nav-logo-circle .logo-fallback {
+  width: 100%; height: 100%; border-radius: 50%; background: var(--green-olive);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 900; color: var(--white); letter-spacing: -.5px;
+}
+.brand-name { font-size: 17px; font-weight: 900; letter-spacing: -.3px; }
+.brand-name span {
+  background: linear-gradient(90deg, var(--grad-start), var(--grad-end));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.nav-cta {
+  background: linear-gradient(135deg, var(--grad-mid), var(--grad-end));
+  color: #1a1000; border: none; border-radius: 99px;
+  padding: 9px 18px; font-size: 12px; font-weight: 800; cursor: pointer;
+}
+
+/* ===== HERO ===== */
+.hero {
+  background: linear-gradient(160deg, var(--green-mid) 0%, var(--green-dark) 60%);
+  padding: 50px 20px 40px; text-align: center; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 240px; height: 240px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(232,184,75,.08), transparent 70%);
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid rgba(232,184,75,.25); border-radius: 99px;
+  padding: 5px 14px; font-size: 11px; font-weight: 600; color: var(--gold);
+  background: rgba(200,160,69,.07); margin-bottom: 20px;
+}
+.hero h1 { font-size: 38px; font-weight: 900; line-height: 1.05; margin-bottom: 12px; }
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--grad-start), var(--grad-mid), var(--grad-end));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero p { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 28px; max-width: 320px; margin-left: auto; margin-right: auto; }
+.hero-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.btn-grad {
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-mid), var(--grad-end));
+  color: #1a1000; border: none; border-radius: 99px; padding: 14px 26px; font-size: 14px; font-weight: 800; cursor: pointer;
+}
+.btn-outline {
+  background: transparent; color: var(--white); border: 1.5px solid rgba(255,255,255,.25);
+  border-radius: 99px; padding: 14px 26px; font-size: 14px; font-weight: 700; cursor: pointer;
+}
+.hero-logo-big {
+  width: 120px; height: 120px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-mid), var(--grad-end));
+  padding: 3px; margin: 0 auto 20px;
+}
+.hero-logo-big .inner {
+  width: 100%; height: 100%; border-radius: 50%; background: var(--green-olive);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 900; letter-spacing: -1px;
+}
+.hero-logo-big img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+/* ===== STATS ===== */
+.stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  background: var(--green-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.stat { padding: 20px 12px; text-align: center; }
+.stat:not(:last-child) { border-right: 1px solid var(--border); }
+.stat-num { font-size: 22px; font-weight: 900; color: var(--gold); }
+.stat-label { font-size: 10px; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: .06em; }
+
+/* ===== HORARIO CARD ===== */
+.horario-section { padding: 28px 20px; background: var(--green-bg); }
+.section-label {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 18px;
+}
+.section-label::before {
+  content: ''; height: 2px; flex: 0 0 24px;
+  background: linear-gradient(90deg, var(--grad-start), var(--grad-end));
+  border-radius: 1px;
+}
+.section-label span { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+
+.horario-card {
+  background: linear-gradient(160deg, var(--green-olive), #1e3210);
+  border-radius: 18px; padding: 24px; border: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.horario-card::after {
+  content: ''; position: absolute; bottom: -30px; right: -30px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(232,184,75,.12), transparent 70%);
+}
+.horario-card h3 { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
+.horario-card .sub { font-size: 11px; color: var(--muted); margin-bottom: 20px; letter-spacing: .06em; text-transform: uppercase; }
+.horario-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.07); align-items: center; }
+.horario-row:last-child { border: none; }
+.horario-day { font-size: 13px; font-weight: 700; }
+.horario-time { font-size: 13px; color: var(--gold); font-weight: 600; }
+.horario-note { font-size: 11px; color: var(--muted); margin-top: 14px; }
+
+/* ===== MENÚ PREVIEW ===== */
+.menu-section { padding: 28px 20px; background: var(--green-dark); }
+.cats { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 4px; }
+.cats::-webkit-scrollbar { display: none; }
+.cat-btn {
+  flex-shrink: 0; padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 600;
+  background: var(--green-card); border: 1px solid var(--border); color: var(--muted); cursor: pointer; white-space: nowrap;
+}
+.cat-btn.active {
+  background: linear-gradient(135deg, var(--grad-mid), var(--grad-end));
+  color: #1a1000; border-color: transparent;
+}
+.menu-item {
+  display: flex; gap: 12px; padding: 14px; background: var(--green-card);
+  border: 1px solid var(--border); border-radius: 14px; margin-bottom: 10px;
+  align-items: center;
+}
+.mi-img { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; flex-shrink: 0; background: var(--green-mid); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.mi-info { flex: 1; }
+.mi-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.mi-desc { font-size: 11.5px; color: var(--muted); line-height: 1.45; margin-bottom: 6px; }
+.mi-tag { display: inline-block; font-size: 9px; padding: 2px 7px; border-radius: 4px; font-weight: 700; background: rgba(92,122,56,.25); color: var(--green-muted); border: 1px solid var(--border); }
+.mi-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+.mi-price { font-size: 15px; font-weight: 900; color: var(--gold); }
+.mi-add {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--grad-mid), var(--grad-end));
+  color: #1a1000; border: none; font-size: 18px; font-weight: 900; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ===== CLUB DIMOE ===== */
+.club-section { padding: 28px 20px; background: var(--green-bg); }
+.club-card {
+  border-radius: 18px; padding: 24px; position: relative; overflow: hidden;
+  background: linear-gradient(135deg, var(--green-olive), #1f3a14);
+  border: 1px solid var(--border);
+}
+.club-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--grad-start), var(--grad-mid), var(--grad-end));
+}
+.club-card h2 { font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+.club-card p { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+.club-levels { display: flex; gap: 8px; }
+.club-level { flex: 1; border-radius: 12px; padding: 14px 10px; text-align: center; border: 1px solid; }
+.club-level.bronze { background: rgba(180,100,50,.12); border-color: rgba(180,100,50,.3); }
+.club-level.silver { background: rgba(180,180,180,.08); border-color: rgba(180,180,180,.25); }
+.club-level.gold { background: rgba(200,160,69,.12); border-color: rgba(200,160,69,.3); }
+.club-level .emoji { font-size: 22px; display: block; margin-bottom: 6px; }
+.club-level .name { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; display: block; }
+.club-level .perk { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+/* ===== FOOTER ===== */
+footer {
+  background: var(--green-card); border-top: 1px solid var(--border);
+  padding: 28px 20px; text-align: center;
+}
+footer .logo-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
+.logo-circle-sm {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-mid), var(--grad-end));
+  padding: 2px;
+}
+.logo-circle-sm .inner { width: 100%; height: 100%; border-radius: 50%; background: var(--green-olive); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; }
+footer p { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+footer .wa-btn {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 14px;
+  background: #25d366; color: #fff; border: none; border-radius: 99px;
+  padding: 12px 22px; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none;
+}
+
+/* ===== PALETTE GUIDE ===== */
+.palette-section {
+  padding: 20px; background: var(--green-dark); border-top: 1px solid var(--border);
+}
+.palette-section h4 { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 14px; }
+.palette-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.swatch { width: 56px; text-align: center; }
+.swatch-circle { width: 56px; height: 56px; border-radius: 50%; margin-bottom: 6px; }
+.swatch span { font-size: 9px; color: var(--muted); display: block; line-height: 1.3; }
+</style>
+</head>
+<body>
+
+<div class="preview-label">⚠️ VISTA PREVIA — paleta verde DiMOE · Sin cambios al original</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-circle">
+      <img src="imagenes/logo.png" alt="DiMOE" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fallback\'>Di</div>'">
+    </div>
+    <div>
+      <div class="brand-name">Di<span>MOE</span></div>
+      <div style="font-size:9px;color:var(--muted);letter-spacing:.06em">PIZZERIA Y RESTOBAR</div>
+    </div>
+  </div>
+  <button class="nav-cta">Reservar 📅</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-logo-big">
+    <img src="imagenes/logo.png" alt="DiMOE" onerror="this.style.display='none';this.parentElement.querySelector('.inner').style.display='flex'">
+    <div class="inner" style="display:none">DiMOE</div>
+  </div>
+  <div class="hero-badge">🍕 Paine, Chile · Desde 2018</div>
+  <h1>Pizzería &<br><em>Restobar</em></h1>
+  <p>Auténtica cocina italiana en el corazón de Paine. Masa napolitana, ingredientes frescos y cócteles artesanales.</p>
+  <div class="hero-btns">
+    <button class="btn-grad">🛵 Pedir ahora</button>
+    <button class="btn-outline">📅 Reservar mesa</button>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-num">4.8⭐</div><div class="stat-label">Calificación</div></div>
+  <div class="stat"><div class="stat-num">+312</div><div class="stat-label">Reseñas</div></div>
+  <div class="stat"><div class="stat-num">~30'</div><div class="stat-label">Delivery</div></div>
+</div>
+
+<!-- HORARIO -->
+<section class="horario-section">
+  <div class="section-label"><span>Horarios de atención</span></div>
+  <div class="horario-card">
+    <h3>Horario Verano 🌞</h3>
+    <p class="sub">Temporada activa</p>
+    <div class="horario-row">
+      <span class="horario-day">Mar – Jue</span>
+      <span class="horario-time">12:30 – 23:00</span>
+    </div>
+    <div class="horario-row">
+      <span class="horario-day">Vie – Sáb</span>
+      <span class="horario-time">12:30 – 02:00</span>
+    </div>
+    <div class="horario-row">
+      <span class="horario-day">Domingo</span>
+      <span class="horario-time">13:00 – 18:00</span>
+    </div>
+    <p class="horario-note">⚠️ Cocina y barra cierran 1 hora antes · Reservas: +569 73694101</p>
+  </div>
+</section>
+
+<!-- MENÚ -->
+<section class="menu-section">
+  <div class="section-label"><span>Nuestra carta</span></div>
+  <div class="cats">
+    <button class="cat-btn active">🍕 Pizzas</button>
+    <button class="cat-btn">🥗 Entradas</button>
+    <button class="cat-btn">🍝 Pastas</button>
+    <button class="cat-btn">🍹 Cócteles</button>
+    <button class="cat-btn">🎁 Promos</button>
+  </div>
+  <div class="menu-item">
+    <div class="mi-img">🍕</div>
+    <div class="mi-info">
+      <div class="mi-name">Mortadella e Pistacchio</div>
+      <div class="mi-desc">Mortadela artesanal, crema de pistacho, base blanca</div>
+      <span class="mi-tag">⭐ Firma DiMOE</span>
+    </div>
+    <div class="mi-right">
+      <div class="mi-price">$13.800</div>
+      <button class="mi-add">+</button>
+    </div>
+  </div>
+  <div class="menu-item">
+    <div class="mi-img">🍕</div>
+    <div class="mi-info">
+      <div class="mi-name">Catalina Salmón</div>
+      <div class="mi-desc">Salmón ahumado, alcaparras, crema, cebolla morada</div>
+      <span class="mi-tag">✨ Especial</span>
+    </div>
+    <div class="mi-right">
+      <div class="mi-price">$14.900</div>
+      <button class="mi-add">+</button>
+    </div>
+  </div>
+  <div class="menu-item">
+    <div class="mi-img">🍹</div>
+    <div class="mi-info">
+      <div class="mi-name">Cóctel DiMOE Signature</div>
+      <div class="mi-desc">Preparación exclusiva con ingredientes frescos de temporada</div>
+      <span class="mi-tag">✨ Firma</span>
+    </div>
+    <div class="mi-right">
+      <div class="mi-price">$8.900</div>
+      <button class="mi-add">+</button>
+    </div>
+  </div>
+</section>
+
+<!-- CLUB DIMOE -->
+<section class="club-section">
+  <div class="section-label"><span>Club DiMOE</span></div>
+  <div class="club-card">
+    <h2>Únete al Club 🏆</h2>
+    <p>Acumula puntos, accede a descuentos exclusivos y sé el primero en conocer las novedades de DiMOE.</p>
+    <div class="club-levels">
+      <div class="club-level bronze">
+        <span class="emoji">🥉</span>
+        <span class="name">Bronze</span>
+        <span class="perk">5% desc.</span>
+      </div>
+      <div class="club-level silver">
+        <span class="emoji">🥈</span>
+        <span class="name">Silver</span>
+        <span class="perk">10% desc.</span>
+      </div>
+      <div class="club-level gold">
+        <span class="emoji">🥇</span>
+        <span class="name">Gold</span>
+        <span class="perk">15% + gift</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PALETTE GUIDE -->
+<div class="palette-section">
+  <h4>Paleta de colores propuesta</h4>
+  <div class="palette-grid">
+    <div class="swatch">
+      <div class="swatch-circle" style="background:#0d1a08;border:1px solid #333"></div>
+      <span>Fondo<br>#0d1a08</span>
+    </div>
+    <div class="swatch">
+      <div class="swatch-circle" style="background:#3d5922"></div>
+      <span>Oliva<br>#3d5922</span>
+    </div>
+    <div class="swatch">
+      <div class="swatch-circle" style="background:#5c7a38"></div>
+      <span>Verde<br>#5c7a38</span>
+    </div>
+    <div class="swatch">
+      <div class="swatch-circle" style="background:#c8a045"></div>
+      <span>Dorado<br>#c8a045</span>
+    </div>
+    <div class="swatch">
+      <div class="swatch-circle" style="background:linear-gradient(135deg,#e84b8a,#e8804b,#e8c84b)"></div>
+      <span>Grad. logo<br>rosa→oro</span>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo-row">
+    <div class="logo-circle-sm">
+      <img src="imagenes/logo.png" width="100%" height="100%" style="border-radius:50%;object-fit:cover" onerror="this.style.display='none';this.parentElement.querySelector('.inner').style.display='flex'">
+      <div class="inner" style="display:none">Di</div>
+    </div>
+    <div>
+      <div style="font-size:16px;font-weight:900">DiMOE</div>
+      <div style="font-size:10px;color:var(--muted)">Pizzería y Restobar</div>
+    </div>
+  </div>
+  <p>📍 Darío Pavez 16, Paine, Chile</p>
+  <p>Lun–Dom · Delivery y Reservas</p>
+  <a class="wa-btn" href="#">💬 +569 73694101</a>
+</footer>
+
+</body>
+</html>

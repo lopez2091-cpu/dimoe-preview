@@ -931,8 +931,12 @@ function go(id, el) {
 }
 
 function topAction() {
-  const active = document.querySelector('.nav-item.active span:last-of-type')?.textContent || '';
-  alert('Esta acción abrirá el formulario correspondiente en la versión final del sistema.');
+  const btn = document.getElementById('topbar-btn').textContent.trim();
+  if (btn === '+ Nuevo pedido') {
+    window.open('pedido_dimoe.html', '_blank');
+  } else {
+    alert('Esta acción abrirá el formulario correspondiente en la versión final del sistema.');
+  }
 }
 
 // Simulated live counter
