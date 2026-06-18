@@ -11,45 +11,73 @@
 body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--cream);overflow-x:hidden;}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 48px;background:rgba(14,12,9,0.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:20px 48px;background:transparent;backdrop-filter:blur(0px);border-bottom:1px solid transparent;transition:all .4s ease;}
+nav.scrolled{padding:12px 48px;background:rgba(14,12,9,.97);backdrop-filter:blur(12px);border-bottom-color:var(--border);}
 .nlogo img{height:44px;filter:brightness(0) invert(1);opacity:.92;}
 .nlinks{display:flex;gap:28px;}
-.nlinks a{color:var(--cream);text-decoration:none;font-size:11.5px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;opacity:.75;transition:.2s;cursor:pointer;}
+.nlinks a{color:var(--cream);text-decoration:none;font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;opacity:.7;transition:.2s;cursor:pointer;position:relative;}
+.nlinks a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:var(--gold);transform:scaleX(0);transition:.25s;}
 .nlinks a:hover{opacity:1;color:var(--gold-l);}
-.nbtn{background:var(--gold);color:var(--dark);padding:10px 22px;border-radius:2px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none;transition:.2s;}
+.nlinks a:hover::after{transform:scaleX(1);}
+.nbtn{background:var(--gold);color:var(--dark);padding:10px 22px;border-radius:2px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none;transition:.2s;position:relative;overflow:hidden;}
+.nbtn::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.12);transform:translateX(-100%);transition:.3s;}
+.nbtn:hover::before{transform:translateX(0);}
 .nbtn:hover{background:var(--gold-l);}
+/* Mobile hamburger */
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.hamburger span{display:block;width:24px;height:2px;background:var(--cream);border-radius:2px;transition:.3s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(14,12,9,.98);z-index:199;flex-direction:column;align-items:center;justify-content:center;gap:36px;}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{color:var(--cream);text-decoration:none;font-family:'Playfair Display',serif;font-size:32px;font-weight:700;opacity:.8;transition:.2s;cursor:pointer;}
+.mobile-menu a:hover{opacity:1;color:var(--gold);}
+.mmcta{margin-top:12px;}
 
 /* HERO */
 .hero{height:100vh;min-height:700px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;}
-.hero-bg{position:absolute;inset:0;background-image:url('imagenes/hero.jpg');background-size:cover;background-position:center;filter:brightness(.32);}
-.hero-ov{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(61,42,10,.5) 0%,rgba(14,12,9,.65) 70%);}
+.hero-bg{position:absolute;inset:0;background-image:url('imagenes/hero.jpg');background-size:cover;background-position:center;filter:brightness(.28);transform:scale(1.06);animation:hzoom 12s ease-out forwards;}
+@keyframes hzoom{from{transform:scale(1.06)}to{transform:scale(1)}}
+.hero-ov{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(61,42,10,.45) 0%,rgba(14,12,9,.72) 70%);}
+/* grain texture */
+.hero::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");opacity:.6;z-index:1;pointer-events:none;}
 .hcontent{position:relative;z-index:2;}
-.hbadge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(200,146,42,.4);border-radius:99px;padding:7px 18px;margin-bottom:30px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-l);}
+.hbadge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(200,146,42,.4);border-radius:99px;padding:7px 18px;margin-bottom:30px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-l);opacity:0;animation:fadeup .8s .2s ease forwards;}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--gold-l);animation:blink 2s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.hero h1{font-family:'Playfair Display',serif;font-size:clamp(56px,9vw,100px);font-weight:900;line-height:.88;letter-spacing:-3px;}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(60px,10vw,110px);font-weight:900;line-height:.86;letter-spacing:-3px;opacity:0;animation:fadeup .9s .45s ease forwards;}
 .hero h1 em{font-style:italic;color:var(--gold);}
-.htag{font-size:12px;letter-spacing:5px;text-transform:uppercase;color:var(--muted);margin:22px 0 40px;}
-.hbtns{display:flex;gap:14px;justify-content:center;}
-.btn-g{background:var(--gold);color:var(--dark);padding:15px 36px;border-radius:2px;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;border:none;transition:.2s;}
-.btn-g:hover{background:var(--gold-l);transform:translateY(-2px);}
-.btn-o{background:transparent;color:var(--cream);padding:15px 36px;border-radius:2px;font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;border:1px solid rgba(245,240,232,.25);transition:.2s;}
-.btn-o:hover{border-color:var(--gold);color:var(--gold);}
-.hscroll{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;}
+.htag{font-size:11px;letter-spacing:6px;text-transform:uppercase;color:var(--muted);margin:24px 0 44px;opacity:0;animation:fadeup .8s .65s ease forwards;}
+.hbtns{display:flex;gap:14px;justify-content:center;opacity:0;animation:fadeup .8s .85s ease forwards;}
+@keyframes fadeup{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.btn-g{background:var(--gold);color:var(--dark);padding:15px 36px;border-radius:2px;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;border:none;transition:.25s;position:relative;overflow:hidden;}
+.btn-g::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.14);transform:translateX(-100%);transition:.3s;}
+.btn-g:hover::after{transform:translateX(0);}
+.btn-g:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(200,146,42,.35);}
+.btn-o{background:transparent;color:var(--cream);padding:15px 36px;border-radius:2px;font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;border:1px solid rgba(245,240,232,.28);transition:.25s;}
+.btn-o:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px);}
+.hscroll{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fadeup .8s 1.2s ease forwards;}
 .hscroll span{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);}
 .sline{width:1px;height:40px;background:linear-gradient(to bottom,var(--gold),transparent);animation:sa 2.5s infinite;}
 @keyframes sa{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 
-/* AWARD */
-.award{background:var(--gold);display:flex;align-items:center;justify-content:center;gap:16px;padding:15px;}
-.award p{font-size:12px;font-weight:700;color:var(--dark);letter-spacing:1.5px;text-transform:uppercase;}
+/* MARQUEE TICKER */
+.ticker{overflow:hidden;background:var(--gold);padding:13px 0;border-top:none;border-bottom:none;}
+.ticker-inner{display:flex;gap:0;white-space:nowrap;animation:tick 28s linear infinite;}
+.ticker-inner:hover{animation-play-state:paused;}
+.ticker-item{display:inline-flex;align-items:center;gap:14px;padding:0 40px;font-size:11px;font-weight:700;color:var(--dark);letter-spacing:2px;text-transform:uppercase;flex-shrink:0;}
+.ticker-sep{color:rgba(14,12,9,.35);font-size:18px;}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* NUMBERS */
 .nums{display:grid;grid-template-columns:repeat(4,1fr);background:var(--dark2);border-bottom:1px solid var(--border);}
-.ni{padding:32px 20px;text-align:center;border-right:1px solid var(--border);}
+.ni{padding:40px 20px;text-align:center;border-right:1px solid var(--border);position:relative;overflow:hidden;}
+.ni::before{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:2px;background:var(--gold);transition:width .5s ease;}
+.ni:hover::before{width:60%;}
 .ni:last-child{border-right:none;}
-.nv{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:var(--gold);line-height:1;}
-.nl{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-top:6px;}
+.nv{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;color:var(--gold);line-height:1;}
+.nl{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-top:8px;}
 
 /* ABOUT */
 .about{max-width:1200px;margin:0 auto;padding:100px 48px;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
@@ -293,22 +321,56 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 /* PREVIEW BADGE */
 .pvbadge{position:fixed;top:70px;right:0;z-index:300;background:rgba(200,146,42,.95);color:var(--dark);padding:7px 16px 7px 18px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-radius:4px 0 0 4px;}
 
+/* MANIFESTO */
+.manifesto{padding:120px 48px;text-align:center;position:relative;overflow:hidden;background:var(--dark2);}
+.manifesto::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(200,146,42,.06),transparent 70%);pointer-events:none;}
+.mq-pre{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:28px;}
+.mq{font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,60px);font-weight:900;line-height:1.12;max-width:900px;margin:0 auto 24px;color:var(--cream);}
+.mq em{font-style:italic;color:var(--gold);}
+.mq-author{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+.mq-line{width:40px;height:1px;background:var(--gold);margin:16px auto;}
+
+/* REVEAL ANIMATIONS */
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .75s ease,transform .75s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-left{opacity:0;transform:translateX(-40px);transition:opacity .75s ease,transform .75s ease;}
+.reveal-left.visible{opacity:1;transform:translateX(0);}
+.reveal-right{opacity:0;transform:translateX(40px);transition:opacity .75s ease,transform .75s ease;}
+.reveal-right.visible{opacity:1;transform:translateX(0);}
+.stagger>*{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.stagger.visible>*:nth-child(1){opacity:1;transform:translateY(0);transition-delay:.05s;}
+.stagger.visible>*:nth-child(2){opacity:1;transform:translateY(0);transition-delay:.15s;}
+.stagger.visible>*:nth-child(3){opacity:1;transform:translateY(0);transition-delay:.25s;}
+.stagger.visible>*:nth-child(4){opacity:1;transform:translateY(0);transition-delay:.35s;}
+
 /* FOOTER */
-footer{background:#060504;padding:48px 48px;}
-.ftop{display:flex;justify-content:space-between;align-items:center;padding-bottom:28px;border-bottom:1px solid var(--border);}
-.flogo img{height:48px;filter:brightness(0) invert(1);opacity:.7;}
-.flinks{display:flex;gap:24px;}
-.flinks a{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);text-decoration:none;cursor:pointer;}
-.flinks a:hover{color:var(--gold);}
-.fbot{display:flex;justify-content:space-between;padding-top:22px;}
+footer{background:#060504;padding:64px 48px 40px;}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:48px;padding-bottom:48px;border-bottom:1px solid var(--border);}
+.fg-brand{}
+.fg-brand .flogo img{height:44px;filter:brightness(0) invert(1);opacity:.8;margin-bottom:16px;}
+.fg-brand p{font-size:12.5px;color:var(--muted);line-height:1.75;max-width:240px;}
+.fg-brand .fsocial{display:flex;gap:10px;margin-top:18px;}
+.fsocial a{width:34px;height:34px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);text-decoration:none;transition:.2s;cursor:pointer;}
+.fsocial a:hover{border-color:var(--gold);color:var(--gold);}
+.fg-col h4{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:18px;font-weight:700;}
+.fg-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.fg-col ul li a{font-size:12.5px;color:var(--muted);text-decoration:none;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:7px;}
+.fg-col ul li a:hover{color:var(--cream);}
+.fg-col .sch{display:flex;flex-direction:column;gap:8px;}
+.sch-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.sch-row span:last-child{color:var(--cream);font-weight:500;}
+.sch-row.closed span:last-child{color:#ef4444;}
+.fbot{display:flex;justify-content:space-between;align-items:center;padding-top:24px;gap:12px;}
 .fcopy{font-size:11px;color:#3a3530;}
 
 /* ========== MOBILE ========== */
 @media(max-width:768px){
   /* NAV */
-  nav{padding:12px 18px;}
+  nav{padding:14px 18px;}
+  nav.scrolled{padding:10px 18px;}
   .nlinks{display:none;}
-  .nbtn{padding:9px 16px;font-size:10px;letter-spacing:1px;}
+  .nbtn{display:none;}
+  .hamburger{display:flex;}
   .nlogo img{height:36px;}
   .pvbadge{top:58px;font-size:8px;padding:5px 10px 5px 12px;}
 
@@ -382,11 +444,13 @@ footer{background:#060504;padding:48px 48px;}
   .mapin{grid-template-columns:1fr;gap:32px;}
   .mapframe iframe{height:260px;}
 
+  /* MANIFESTO */
+  .manifesto{padding:72px 20px;}
   /* FOOTER */
-  footer{padding:36px 20px;}
-  .ftop{flex-direction:column;align-items:flex-start;gap:18px;}
-  .flinks{flex-wrap:wrap;gap:14px;}
-  .fbot{flex-direction:column;gap:6px;}
+  footer{padding:48px 20px 32px;}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px;}
+  .fg-brand{grid-column:span 2;}
+  .fbot{flex-direction:column;gap:6px;text-align:center;}
 
   /* CHATBOT */
   .chat-win{width:calc(100vw - 24px);right:12px;bottom:86px;}
@@ -404,8 +468,18 @@ footer{background:#060504;padding:48px 48px;}
 
 <div class="pvbadge">Vista Previa · Plan Premium</div>
 
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a onclick="closeMenu();document.querySelector('.msec').scrollIntoView({behavior:'smooth'})">Menú</a>
+  <a onclick="closeMenu();document.querySelector('.about').scrollIntoView({behavior:'smooth'})">Nosotros</a>
+  <a onclick="closeMenu();document.querySelector('.expsec').scrollIntoView({behavior:'smooth'})">Experiencias</a>
+  <a onclick="closeMenu();document.querySelector('.clubsec').scrollIntoView({behavior:'smooth'})">Club DiMOE</a>
+  <a onclick="closeMenu();document.querySelector('.tracksec').scrollIntoView({behavior:'smooth'})">Pedidos</a>
+  <button class="btn-g mmcta" onclick="closeMenu();document.querySelector('.ressec').scrollIntoView({behavior:'smooth'})">Reservar Mesa</button>
+</div>
+
 <!-- NAV -->
-<nav>
+<nav id="mainNav">
   <div class="nlogo"><img src="imagenes/logo.png" alt="DiMOE"></div>
   <div class="nlinks">
     <a onclick="document.querySelector('.msec').scrollIntoView({behavior:'smooth'})">Menú</a>
@@ -415,6 +489,9 @@ footer{background:#060504;padding:48px 48px;}
     <a onclick="document.querySelector('.tracksec').scrollIntoView({behavior:'smooth'})">Pedidos</a>
   </div>
   <button class="nbtn" onclick="document.querySelector('.ressec').scrollIntoView({behavior:'smooth'})">Reservar Mesa</button>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -433,25 +510,53 @@ footer{background:#060504;padding:48px 48px;}
   <div class="hscroll"><span>Descubre</span><div class="sline"></div></div>
 </div>
 
-<!-- AWARD -->
-<div class="award"><span>🏆</span><p>2° Lugar · Mejor Pizza Región Metropolitana · @thetopchile 2025</p><span>🏆</span></div>
+<!-- MARQUEE TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">🏆 2° Lugar Mejor Pizza RM <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">🍕 Masa Napolitana Auténtica <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">📍 Paine, Región Metropolitana <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">⭐ 4.8 en Google · 312 Reseñas <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">🌱 Ingredientes 100% Frescos <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">🐾 Pet Friendly <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">🎶 Música en Vivo <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">🏆 2° Lugar Mejor Pizza RM <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">🍕 Masa Napolitana Auténtica <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">📍 Paine, Región Metropolitana <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">⭐ 4.8 en Google · 312 Reseñas <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">🌱 Ingredientes 100% Frescos <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">🐾 Pet Friendly <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">🎶 Música en Vivo <span class="ticker-sep">·</span></span>
+  </div>
+</div>
 
 <!-- NUMBERS -->
-<div class="nums">
-  <div class="ni"><div class="nv">2°</div><div class="nl">Mejor Pizza RM</div></div>
-  <div class="ni"><div class="nv">35'</div><div class="nl">Desde Santiago</div></div>
-  <div class="ni"><div class="nv">2021</div><div class="nl">Nació en Paine</div></div>
-  <div class="ni"><div class="nv">100%</div><div class="nl">Ingredientes Frescos</div></div>
+<div class="nums stagger">
+  <div class="ni"><div class="nv" data-count="2" data-suffix="°">2°</div><div class="nl">Mejor Pizza RM</div></div>
+  <div class="ni"><div class="nv" data-count="35" data-suffix="'">35'</div><div class="nl">Min desde Santiago</div></div>
+  <div class="ni"><div class="nv" data-count="312" data-suffix="">312</div><div class="nl">Reseñas 5 estrellas</div></div>
+  <div class="ni"><div class="nv" data-count="100" data-suffix="%">100%</div><div class="nl">Ingredientes Frescos</div></div>
+</div>
+
+<!-- MANIFESTO -->
+<div class="manifesto">
+  <div class="reveal">
+    <div class="mq-pre">Nuestra filosofía</div>
+    <div class="mq-line"></div>
+    <p class="mq">"Una pizza no se improvisa.<br>Se <em>hereda, se perfecciona</em><br>y se sirve con fuego."</p>
+    <div class="mq-line"></div>
+    <div class="mq-author">— Equipo DiMOE · Paine, Chile · Desde 2021</div>
+  </div>
 </div>
 
 <!-- ABOUT -->
 <div class="about">
-  <div class="agrid">
+  <div class="agrid reveal-left">
     <div class="ai big"><img src="imagenes/local.jpg" alt="DiMOE local"></div>
     <div class="ai"><img src="imagenes/mort.jpg" alt="Pizza DiMOE"></div>
     <div class="ai"><img src="imagenes/salm.jpg" alt="DiMOE equipo"></div>
   </div>
-  <div>
+  <div class="reveal-right">
     <div class="lbl">Nuestra Historia</div>
     <h2 class="ttl">Nacimos con<br>la pandemia.<br>Crecimos con <em>fuego.</em></h2>
     <p class="dsc">Lo que comenzó como "Moe Pizzas" entregando pizza napolitana a domicilio en Paine se transformó en algo mucho mayor. En abril de 2024 abrimos nuestro restaurant y hoy somos el referente gastronómico del sur de Santiago.</p>
@@ -561,7 +666,7 @@ footer{background:#060504;padding:48px 48px;}
 <div class="expsec">
   <div class="lbl">Más que comer</div>
   <h2 class="ttl">Una <em>experiencia</em> completa</h2>
-  <div class="expgrid">
+  <div class="expgrid stagger">
     <div class="ec">
       <div class="ec-img"><img src="imagenes/mech.jpg" alt="Cocina" loading="lazy"></div>
       <div class="ec-body"><div class="ec-icon">👨‍🍳</div><div class="ec-title">Cocina con Pasión</div><div class="ec-text">Nuestro equipo prepara cada pizza con amor, ingredientes frescos y la técnica napolitana auténtica que nos dio el 2° lugar nacional.</div></div>
@@ -798,13 +903,51 @@ footer{background:#060504;padding:48px 48px;}
 
 <!-- FOOTER -->
 <footer>
-  <div class="ftop">
-    <div class="flogo"><img src="imagenes/logo.png" alt="DiMOE"></div>
-    <div class="flinks"><a>Menú</a><a>Reservas</a><a>Club DiMOE</a><a>Pedidos</a><a>Eventos</a><a>Contacto</a></div>
+  <div class="footer-grid">
+    <div class="fg-brand">
+      <div class="flogo"><img src="imagenes/logo.png" alt="DiMOE"></div>
+      <p>Pizzería napolitana y restobar en el corazón de Paine. Arte, música y las mejores pizzas del sur de Santiago desde 2021.</p>
+      <div class="fsocial">
+        <a href="https://www.instagram.com/dimoe_restobar" target="_blank">📷</a>
+        <a href="https://api.whatsapp.com/send/?phone=%2B56973694101" target="_blank">💬</a>
+        <a href="https://www.facebook.com/dimoepizzeria" target="_blank">👤</a>
+      </div>
+    </div>
+    <div class="fg-col">
+      <h4>Navegación</h4>
+      <ul>
+        <li><a onclick="document.querySelector('.msec').scrollIntoView({behavior:'smooth'})">→ Nuestra Carta</a></li>
+        <li><a onclick="document.querySelector('.about').scrollIntoView({behavior:'smooth'})">→ Nosotros</a></li>
+        <li><a onclick="document.querySelector('.expsec').scrollIntoView({behavior:'smooth'})">→ Experiencias</a></li>
+        <li><a onclick="document.querySelector('.clubsec').scrollIntoView({behavior:'smooth'})">→ Club DiMOE</a></li>
+        <li><a onclick="document.querySelector('.tracksec').scrollIntoView({behavior:'smooth'})">→ Pedidos Online</a></li>
+        <li><a onclick="document.querySelector('.ressec').scrollIntoView({behavior:'smooth'})">→ Reservar Mesa</a></li>
+      </ul>
+    </div>
+    <div class="fg-col">
+      <h4>Horarios</h4>
+      <div class="sch">
+        <div class="sch-row"><span>Mar – Jue</span><span>12:30 – 22:30</span></div>
+        <div class="sch-row"><span>Viernes</span><span>13:00 – 00:00</span></div>
+        <div class="sch-row"><span>Sábado</span><span>13:00 – 00:00</span></div>
+        <div class="sch-row"><span>Domingo</span><span>13:00 – 17:30</span></div>
+        <div class="sch-row closed"><span>Lunes</span><span>Cerrado</span></div>
+      </div>
+    </div>
+    <div class="fg-col">
+      <h4>Contacto</h4>
+      <ul>
+        <li><a>📍 Darío Pavez 16, Champa, Paine</a></li>
+        <li><a href="https://api.whatsapp.com/send/?phone=%2B56973694101" target="_blank">💬 +56 9 7369 4101</a></li>
+        <li><a>✉️ contacto@dimoe.cl</a></li>
+        <li><a>🚗 35 min desde Santiago</a></li>
+        <li><a>🅿️ Estacionamiento gratuito</a></li>
+      </ul>
+    </div>
   </div>
   <div class="fbot">
-    <div class="fcopy">© 2025 DiMOE Pizzería y Restobar · Darío Pavez 16, Champa, Paine</div>
-    <div class="fcopy">contacto@dimoe.cl · +56 9 7369 4101</div>
+    <div class="fcopy">© 2025 DiMOE Pizzería y Restobar · Todos los derechos reservados</div>
+    <div class="fcopy">Diseñado con 🍕 para DiMOE</div>
   </div>
 </footer>
 
@@ -913,6 +1056,64 @@ function toggleChat() {
   w.classList.toggle('open');
   b.textContent = w.classList.contains('open') ? '✕' : '🍕';
 }
+
+// ── NAV SCROLL ──
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+}, {passive:true});
+
+// ── MOBILE MENU ──
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+}
+function closeMenu() {
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
+// ── SCROLL REVEAL ──
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObserver.unobserve(e.target);
+    }
+  });
+}, {threshold: 0.12, rootMargin: '0px 0px -40px 0px'});
+
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .stagger, .nums').forEach(el => {
+  revealObserver.observe(el);
+});
+
+// ── COUNTER ANIMATION ──
+function animateCounter(el) {
+  const target = parseInt(el.dataset.count);
+  const suffix = el.dataset.suffix || '';
+  if (isNaN(target)) return;
+  const duration = 1400;
+  const start = performance.now();
+  const update = (now) => {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(eased * target) + suffix;
+    if (progress < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('[data-count]').forEach(animateCounter);
+      counterObserver.unobserve(e.target);
+    }
+  });
+}, {threshold: 0.3});
+
+document.querySelectorAll('.nums').forEach(el => counterObserver.observe(el));
 </script>
 </body>
 </html>
