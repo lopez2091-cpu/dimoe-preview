@@ -1,0 +1,12 @@
+{
+  "name": "dimoe-preview",
+  "version": "1.0.0",
+  "description": "DiMOE Pizzería y Restobar — Vista Previa Plan Premium",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}
