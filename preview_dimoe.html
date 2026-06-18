@@ -262,6 +262,98 @@ footer{background:#060504;padding:48px 48px;}
 .flinks a:hover{color:var(--gold);}
 .fbot{display:flex;justify-content:space-between;padding-top:22px;}
 .fcopy{font-size:11px;color:#3a3530;}
+
+/* ========== MOBILE ========== */
+@media(max-width:768px){
+  /* NAV */
+  nav{padding:12px 18px;}
+  .nlinks{display:none;}
+  .nbtn{padding:9px 16px;font-size:10px;letter-spacing:1px;}
+  .nlogo img{height:36px;}
+  .pvbadge{top:58px;font-size:8px;padding:5px 10px 5px 12px;}
+
+  /* HERO */
+  .hero{min-height:100svh;}
+  .hero h1{font-size:clamp(46px,14vw,68px);letter-spacing:-1px;line-height:.9;}
+  .htag{font-size:10px;letter-spacing:3px;margin:16px 0 28px;}
+  .hbtns{flex-direction:column;align-items:center;gap:10px;}
+  .btn-g,.btn-o{width:100%;max-width:280px;padding:14px 20px;}
+  .hbadge{font-size:10px;padding:6px 14px;margin-bottom:22px;}
+  .hscroll{display:none;}
+
+  /* AWARD */
+  .award{padding:12px 16px;gap:10px;text-align:center;}
+  .award p{font-size:10px;letter-spacing:.5px;}
+
+  /* NUMBERS */
+  .nums{grid-template-columns:repeat(2,1fr);}
+  .ni{padding:22px 12px;}
+  .nv{font-size:32px;}
+  .nl{font-size:9px;}
+  .ni:nth-child(2){border-right:none;}
+  .ni:nth-child(3){border-top:1px solid var(--border);}
+
+  /* ABOUT */
+  .about{grid-template-columns:1fr;padding:52px 20px;gap:32px;}
+  .agrid{height:280px;grid-template-columns:1fr 1fr;grid-template-rows:280px;}
+  .ai.big{grid-row:span 1;}
+  .ttl{font-size:clamp(26px,8vw,38px);}
+
+  /* MENU */
+  .msec{padding:60px 20px;}
+  .mpanel.on{grid-template-columns:1fr!important;}
+  .mc-img{height:200px;}
+  .promo-row{flex-direction:column;gap:14px;}
+  .promo-img{width:100%;height:180px;}
+  .promo-img img{width:100%;height:100%;object-fit:cover;}
+
+  /* EXPERIENCIAS */
+  .expsec{padding:60px 20px;}
+  .expgrid{grid-template-columns:1fr;}
+
+  /* RESERVAS */
+  .ressec{padding:60px 20px;}
+  .resinn{grid-template-columns:1fr;gap:36px;}
+  .fcard{padding:24px 18px;}
+  .frow{grid-template-columns:1fr;}
+
+  /* TRACKING */
+  .tracksec{padding:60px 20px;}
+  .trackin{grid-template-columns:1fr;gap:36px;}
+
+  /* CLUB */
+  .clubsec{padding:60px 20px;}
+  .clubhdr{grid-template-columns:1fr;gap:28px;}
+  .levels{grid-template-columns:repeat(2,1fr);}
+  .wallet{max-width:100%;padding:20px;}
+  .wpts{font-size:36px;}
+
+  /* INSTAGRAM */
+  .igsec{padding:52px 20px;}
+  .ig-grid{grid-template-columns:repeat(2,1fr);}
+  .ig-hdr{flex-direction:column;align-items:flex-start;gap:12px;}
+
+  /* MAPS */
+  .mapsec{padding:52px 20px;}
+  .mapin{grid-template-columns:1fr;gap:32px;}
+  .mapframe iframe{height:260px;}
+
+  /* FOOTER */
+  footer{padding:36px 20px;}
+  .ftop{flex-direction:column;align-items:flex-start;gap:18px;}
+  .flinks{flex-wrap:wrap;gap:14px;}
+  .fbot{flex-direction:column;gap:6px;}
+
+  /* CHATBOT */
+  .chat-win{width:calc(100vw - 24px);right:12px;bottom:86px;}
+  .chat-btn{bottom:20px;right:16px;width:50px;height:50px;font-size:20px;}
+  .wa-float{bottom:20px;left:12px;font-size:11px;padding:10px 14px;}
+
+  /* SECCIONES GENERICAS */
+  .lbl{font-size:9px;}
+  .dsc{font-size:13px;}
+  .tags{margin-top:18px;}
+}
 </style>
 </head>
 <body>
